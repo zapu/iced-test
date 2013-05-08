@@ -170,7 +170,7 @@ exports.ServerRunner = class ServerRunner extends Runner
 
   ##-----------------------------------------
   
-  load_files : (mainfile, whitelist, cb) ->
+  load_files : ({mainfile, whitelist, files_dir}, cb) ->
     
     wld = null
     if whitelist?
@@ -178,6 +178,7 @@ exports.ServerRunner = class ServerRunner extends Runner
       wld[k] = true for k in whitelist
     
     @_dir = path.dirname mainfile
+    @_dir = path.join @_dir, files_dir if files_dir? 
     base = path.basename mainfile
     await fs.readdir @_dir, defer err, files
     if err?
@@ -214,9 +215,9 @@ exports.ServerRunner = class ServerRunner extends Runner
 
   ##-----------------------------------------
 
-  run : (mainfile, whitelist, cb) ->
+  run : (opts, cb) ->
     await @init defer ok
-    await @load_files mainfile, whitelist, defer ok  if ok
+    await @load_files opts, defer ok  if ok
     await @run_files defer() if ok
     @report()
     await @finish defer ok
@@ -224,7 +225,7 @@ exports.ServerRunner = class ServerRunner extends Runner
 
 ##-----------------------------------------------------------------------
 
-$ = (m) -> window.document.getElementById(m)
+$ = (m) -> window?.document?.getElementById(m)
 
 ##-----------------------------------------------------------------------
 
@@ -241,7 +242,7 @@ exports.BrowserRunner = class BrowserRunner extends Runner
     style.color = "green" if green
     style.color = "red" if red
     style.weight = "bold" if bold
-    style_tag = ("k: #{v}" for k,v of style).join "; "
+    style_tag = ("#{k}: #{v}" for k,v of style).join "; "
     tag = "<p style=\"#{style_tag}\">#{m}</p>\n"
     $(@divs.log).innerHTML += tag
 
@@ -258,9 +259,10 @@ exports.BrowserRunner = class BrowserRunner extends Runner
 
 ##-----------------------------------------------------------------------
 
-exports.run = (mainfile, klass = ServerRunner, whitelist = null) ->
+exports.run = ({mainfile, klass, whitelist, files_dir}) ->
+  klass = ServerRunner unless klass?
   runner = new klass()
-  await runner.run mainfile, whitelist, defer rc
+  await runner.run { mainfile, whitelist, files_dir }, defer rc
   process.exit rc
 
 ##-----------------------------------------------------------------------

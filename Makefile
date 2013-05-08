@@ -2,9 +2,9 @@
 ICED=node_modules/.bin/iced
 
 index.js: index.iced
-	$(ICED) -m -c $<
+	$(ICED) -I browserify -m -c $<
 
-default: setup index.js
+default: index.js
 
 pubclean:
 	rm -rf node_modules
