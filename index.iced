@@ -11,10 +11,11 @@ BAD_X = "\u2716"
 ##-----------------------------------------------------------------------
 
 exports.File = class File
-  constructor : (@name) ->
+  constructor : (@name, @runner) ->
   new_case : () -> return new Case @
   default_init : (cb) -> cb true
   default_destroy : (cb) -> cb true
+  test_error_message : (m) -> @runner.test_error_message m
 
 ##-----------------------------------------------------------------------
 
@@ -34,7 +35,7 @@ exports.Case = class Case
   
   assert : (f, what) ->
     if not f
-      console.log "Assertion failed: #{what}"
+      @error "Assertion failed: #{what}"
       @_ok = false
 
   ##-----------------------------------------
@@ -42,13 +43,13 @@ exports.Case = class Case
   equal : (a,b,what) ->
     if not deep_equal a, b
       [ja, jb] = [JSON.stringify(a), JSON.stringify(b)]
-      console.log "In #{what}: #{ja} != #{jb}".red
+      @error "In #{what}: #{ja} != #{jb}"
       @_ok = false
 
   ##-----------------------------------------
   
   error : (e) ->
-    console.log e.red
+    @file.test_error_message e
     @_ok = false
 
   ##-----------------------------------------
@@ -79,7 +80,7 @@ class Runner
 
   ##-----------------------------------------
 
-  new_file_obj : (fn) -> new File fn
+  new_file_obj : (fn) -> new File fn, @
    
   ##-----------------------------------------
   
@@ -122,6 +123,22 @@ class Runner
 
   ##-----------------------------------------
 
+  report : () ->
+    if @_rc < 0
+      @err "#{BAD_X} Failure due to test configuration issues"
+    @_rc = -1 unless @_tests is @_successes
+
+    opts = if @_rc is 0 then { green : true } else { red : true }
+    opts.bold = true
+
+    @log "Tests: #{@_successes}/#{@_tests} passed", opts
+    
+    if @_n_files isnt @_n_good_files
+      @err " -> Only #{@_n_good_files}/#{@_n_files} files ran properly", { bold : true }
+    return @_rc
+
+  ##-----------------------------------------
+
   err : (e, opts = {}) ->
     opts.red = true
     @log e, opts
@@ -133,6 +150,8 @@ class Runner
     @log txt, { green : true }
   report_bad_outcome : (txt) ->
     @log txt, { red : true, bold : true }
+  test_error_message : (txt) ->
+    @log "- #{txt}", { red : true }
 
   ##-----------------------------------------
 
@@ -192,22 +211,6 @@ exports.ServerRunner = class ServerRunner extends Runner
       @_files.sort()
     cb ok
    
-  ##-----------------------------------------
-
-  report : () ->
-    if @_rc < 0
-      @err "#{BAD_X} Failure due to test configuration issues"
-    @_rc = -1 unless @_tests is @_successes
-
-    opts = if @_rc is 0 then { green : true } else { red : true }
-    opts.bold = true
-
-    @log "Tests: #{@_successes}/#{@_tests} passed", opts
-    
-    if @_n_files isnt @_n_good_files
-      @err " -> Only #{@_n_good_files}/#{@_n_files} files ran properly", { bold : true }
-    return @_rc
-
   #-------------------------------------
 
   report_good_outcome : (msg) -> console.log msg.green
@@ -254,7 +257,7 @@ exports.BrowserRunner = class BrowserRunner extends Runner
       await @run_code k, v, defer ok
     @report()
     await @finish defer ok
-    $(@divs.rc).innertHTML = @_rc
+    $(@divs.rc).innerHTML = @_rc
     cb @_rc
 
 ##-----------------------------------------------------------------------
