@@ -6,7 +6,10 @@ index.js: index.iced
 
 default: setup index.js
 
+pubclean:
+	rm -rf node_modules
+
 setup:
 	npm install -d
 
-.PHONY: setup
+.PHONY: setup pubclean
