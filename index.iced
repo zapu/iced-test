@@ -244,7 +244,7 @@ exports.BrowserRunner = class BrowserRunner extends Runner
       margin : "0px"
     style.color = "green" if green
     style.color = "red" if red
-    style.weight = "bold" if bold
+    style["font-weight"] = "bold" if bold
     style_tag = ("#{k}: #{v}" for k,v of style).join "; "
     tag = "<p style=\"#{style_tag}\">#{m}</p>\n"
     $(@divs.log).innerHTML += tag
