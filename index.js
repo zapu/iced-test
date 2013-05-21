@@ -367,13 +367,14 @@
     }
 
     ServerRunner.prototype.run_file = function(f, cb) {
-      var dat, e, ___iced_passed_deferral, __iced_deferrals, __iced_k,
+      var dat, e, m, ___iced_passed_deferral, __iced_deferrals, __iced_k,
         _this = this;
       __iced_k = __iced_k_noop;
       ___iced_passed_deferral = iced.findDeferral(arguments);
       (function(__iced_k) {
         try {
-          dat = require(path.join(_this._dir, f));
+          m = path.resolve(_this._dir, f);
+          dat = require(m);
           if (dat.skip == null) {
             (function(__iced_k) {
               __iced_deferrals = new iced.Deferrals(__iced_k, {
@@ -382,7 +383,7 @@
                 funcname: "ServerRunner.run_file"
               });
               _this.run_code(f, dat, __iced_deferrals.defer({
-                lineno: 176
+                lineno: 177
               }));
               __iced_deferrals._fulfill();
             })(__iced_k);
@@ -391,7 +392,7 @@
           }
         } catch (_error) {
           e = _error;
-          return _this.err("In reading " + f + ": " + e + "\n" + e.stack);
+          return _this.err("In reading " + m + ": " + e + "\n" + e.stack);
         }
       })(function() {
         return cb();
@@ -445,7 +446,7 @@
               return files = arguments[1];
             };
           })(),
-          lineno: 201
+          lineno: 202
         }));
         __iced_deferrals._fulfill();
       })(function() {
@@ -493,7 +494,7 @@
               return ok = arguments[0];
             };
           })(),
-          lineno: 221
+          lineno: 222
         }));
         __iced_deferrals._fulfill();
       })(function() {
@@ -511,7 +512,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 222
+                lineno: 223
               }));
               __iced_deferrals._fulfill();
             })(__iced_k);
@@ -528,7 +529,7 @@
                   funcname: "ServerRunner.run"
                 });
                 _this.run_files(__iced_deferrals.defer({
-                  lineno: 223
+                  lineno: 224
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -549,7 +550,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 225
+                lineno: 226
               }));
               __iced_deferrals._fulfill();
             })(function() {
@@ -622,7 +623,7 @@
               return ok = arguments[0];
             };
           })(),
-          lineno: 254
+          lineno: 255
         }));
         __iced_deferrals._fulfill();
       })(function() {
@@ -672,7 +673,7 @@
                         return ok = arguments[0];
                       };
                     })(),
-                    lineno: 256
+                    lineno: 257
                   }));
                   __iced_deferrals._fulfill();
                 })(_next);
@@ -696,7 +697,7 @@
                   return ok = arguments[0];
                 };
               })(),
-              lineno: 258
+              lineno: 259
             }));
             __iced_deferrals._fulfill();
           })(function() {
@@ -737,7 +738,7 @@
             return rc = arguments[0];
           };
         })(),
-        lineno: 267
+        lineno: 268
       }));
       __iced_deferrals._fulfill();
     })(function() {

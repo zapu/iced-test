@@ -173,10 +173,11 @@ exports.ServerRunner = class ServerRunner extends Runner
   
   run_file : (f, cb) ->
     try
-      dat = require path.join @_dir, f
+      m = path.resolve @_dir, f
+      dat = require m
       await @run_code f, dat, defer() unless dat.skip?
     catch e
-      @err "In reading #{f}: #{e}\n#{e.stack}"
+      @err "In reading #{m}: #{e}\n#{e.stack}"
     cb()
 
   ##-----------------------------------------
