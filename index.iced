@@ -7,6 +7,7 @@ urlmod = require 'url'
 
 CHECK = "\u2714"
 BAD_X = "\u2716"
+WAYPOINT = "\u2611"
 
 ##-----------------------------------------------------------------------
 
@@ -16,6 +17,7 @@ exports.File = class File
   default_init : (cb) -> cb true
   default_destroy : (cb) -> cb true
   test_error_message : (m) -> @runner.test_error_message m
+  waypoint : (m) -> @runner.m
 
 ##-----------------------------------------------------------------------
 
@@ -55,6 +57,11 @@ exports.Case = class Case
   ##-----------------------------------------
   
   is_ok : () -> @_ok
+
+  ##-----------------------------------------
+
+  waypoint : (m) -> @file.waypoint m
+  
 
 ##-----------------------------------------------------------------------
 
@@ -146,6 +153,8 @@ class Runner
 
   ##-----------------------------------------
 
+  waypoint : (txt) ->
+    @log "  #{WAYPOINT} #{txt}", { green : true }
   report_good_outcome : (txt) ->
     @log txt, { green : true }
   report_bad_outcome : (txt) ->
