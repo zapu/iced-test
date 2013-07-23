@@ -17,7 +17,7 @@ exports.File = class File
   default_init : (cb) -> cb true
   default_destroy : (cb) -> cb true
   test_error_message : (m) -> @runner.test_error_message m
-  waypoint : (m) -> @runner.m
+  waypoint : (m) -> @runner.waypoint m
 
 ##-----------------------------------------------------------------------
 
@@ -95,7 +95,7 @@ class Runner
     fo = @new_file_obj fn
     
     if code.init?
-      await code.init fo, defer err
+      await code.init fo.new_case(), defer err
     else
       await fo.default_init defer ok
       err = "failed to run default init" unless ok
@@ -122,7 +122,7 @@ class Runner
           @report_bad_outcome "#{BAD_X} #{fn}: #{k}"
           
     if destroy?
-      await destroy fo, defer()
+      await destroy fo.new_case(), defer()
     else
       await fo.default_destroy defer()
       

@@ -46,7 +46,7 @@
     };
 
     File.prototype.waypoint = function(m) {
-      return this.runner.m;
+      return this.runner.waypoint(m);
     };
 
     return File;
@@ -174,7 +174,7 @@
               filename: "index.iced",
               funcname: "Runner.run_code"
             });
-            code.init(fo, __iced_deferrals.defer({
+            code.init(fo.new_case(), __iced_deferrals.defer({
               assign_fn: (function() {
                 return function() {
                   return err = arguments[0];
@@ -281,7 +281,7 @@
                   filename: "index.iced",
                   funcname: "Runner.run_code"
                 });
-                destroy(fo, __iced_deferrals.defer({
+                destroy(fo.new_case(), __iced_deferrals.defer({
                   lineno: 124
                 }));
                 __iced_deferrals._fulfill();
