@@ -84,6 +84,13 @@
       return this._ok = false;
     };
 
+    Case.prototype.no_error = function(e) {
+      if (e != null) {
+        this.error("In " + what + ": " + (e.toString()));
+        return this._ok = false;
+      }
+    };
+
     Case.prototype.is_ok = function() {
       return this._ok;
     };
@@ -144,7 +151,7 @@
                 funcname: "Runner.run_files"
               });
               _this.run_file(f, __iced_deferrals.defer({
-                lineno: 84
+                lineno: 91
               }));
               __iced_deferrals._fulfill();
             })(_next);
@@ -180,7 +187,7 @@
                   return err = arguments[0];
                 };
               })(),
-              lineno: 97
+              lineno: 104
             }));
             __iced_deferrals._fulfill();
           })(__iced_k);
@@ -197,7 +204,7 @@
                   return ok = arguments[0];
                 };
               })(),
-              lineno: 99
+              lineno: 106
             }));
             __iced_deferrals._fulfill();
           })(function() {
@@ -261,7 +268,7 @@
                           return err = arguments[0];
                         };
                       })(),
-                      lineno: 114
+                      lineno: 121
                     }));
                     __iced_deferrals._fulfill();
                   })(function() {
@@ -282,7 +289,7 @@
                   funcname: "Runner.run_code"
                 });
                 destroy(fo.new_case(), __iced_deferrals.defer({
-                  lineno: 124
+                  lineno: 131
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -294,7 +301,7 @@
                   funcname: "Runner.run_code"
                 });
                 fo.default_destroy(__iced_deferrals.defer({
-                  lineno: 126
+                  lineno: 133
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -399,7 +406,7 @@
                 funcname: "ServerRunner.run_file"
               });
               _this.run_code(f, dat, __iced_deferrals.defer({
-                lineno: 186
+                lineno: 193
               }));
               __iced_deferrals._fulfill();
             })(__iced_k);
@@ -462,7 +469,7 @@
               return files = arguments[1];
             };
           })(),
-          lineno: 211
+          lineno: 218
         }));
         __iced_deferrals._fulfill();
       })(function() {
@@ -510,7 +517,7 @@
               return ok = arguments[0];
             };
           })(),
-          lineno: 231
+          lineno: 238
         }));
         __iced_deferrals._fulfill();
       })(function() {
@@ -528,7 +535,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 232
+                lineno: 239
               }));
               __iced_deferrals._fulfill();
             })(__iced_k);
@@ -545,7 +552,7 @@
                   funcname: "ServerRunner.run"
                 });
                 _this.run_files(__iced_deferrals.defer({
-                  lineno: 233
+                  lineno: 240
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -566,7 +573,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 235
+                lineno: 242
               }));
               __iced_deferrals._fulfill();
             })(function() {
@@ -639,7 +646,7 @@
               return ok = arguments[0];
             };
           })(),
-          lineno: 264
+          lineno: 271
         }));
         __iced_deferrals._fulfill();
       })(function() {
@@ -689,7 +696,7 @@
                         return ok = arguments[0];
                       };
                     })(),
-                    lineno: 266
+                    lineno: 273
                   }));
                   __iced_deferrals._fulfill();
                 })(_next);
@@ -713,7 +720,7 @@
                   return ok = arguments[0];
                 };
               })(),
-              lineno: 268
+              lineno: 275
             }));
             __iced_deferrals._fulfill();
           })(function() {
@@ -754,7 +761,7 @@
             return rc = arguments[0];
           };
         })(),
-        lineno: 277
+        lineno: 284
       }));
       __iced_deferrals._fulfill();
     })(function() {

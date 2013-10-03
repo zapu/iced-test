@@ -55,6 +55,13 @@ exports.Case = class Case
     @_ok = false
 
   ##-----------------------------------------
+
+  no_error : (e) ->
+    if e?
+      @error "In #{what}: #{e.toString()}"
+      @_ok = false
+      
+  ##-----------------------------------------
   
   is_ok : () -> @_ok
 
