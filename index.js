@@ -86,7 +86,7 @@
 
     Case.prototype.no_error = function(e) {
       if (e != null) {
-        this.error("In " + what + ": " + (e.toString()));
+        this.error(e.toString());
         return this._ok = false;
       }
     };
