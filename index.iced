@@ -11,6 +11,13 @@ WAYPOINT = "\u2611"
 
 ##-----------------------------------------------------------------------
 
+sort_fn = (a,b) ->
+  if (m1 = a.match /^(\d+)_/)? and (m2 = b.match /^(\d+)_/)? 
+    parseInt(m1[1]) - parseInt(m2[1])
+  else a.localeCompare(b)
+
+##-----------------------------------------------------------------------
+
 exports.File = class File
   constructor : (@name, @runner) ->
   new_case : () -> return new Case @
@@ -225,7 +232,7 @@ exports.ServerRunner = class ServerRunner extends Runner
       re = /.*\.(iced|coffee)$/
       for file in files when file.match(re) and (file isnt base) and (not wld? or wld[file])
         @_files.push file
-      @_files.sort()
+      @_files.sort sort_fn
     cb ok
    
   #-------------------------------------
