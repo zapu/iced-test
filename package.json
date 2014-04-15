@@ -1,22 +1,23 @@
 {
-  "name" : "iced-test",
-  "version" : "0.0.10",
-  "description" : "A testing class written with IcedCoffeeScript",
-  "homepage" : "https://github.com/maxtaco/iced-test",
-  "main" : "./index.js",
-  "repository" : { 
-    "type" : "git",
-     "url" : "https://github.com/maxtaco/iced-test.git"
+  "name": "iced-test",
+  "version": "0.0.10",
+  "description": "A testing class written with IcedCoffeeScript",
+  "homepage": "https://github.com/maxtaco/iced-test",
+  "main": "./index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maxtaco/iced-test.git"
   },
-  "devDependencies" : {
-    "iced-coffee-script" : "*"
+  "dependencies": {
+    "colors": "^0.6.2",
+    "deep-equal": "^0.2.1",
+    "minimist": "0.0.8",
+    "iced-coffee-script": "^1.7.1-b"
   },
-  "dependencies" : {
-    "colors" : "*",
-    "deep-equal" : "*"
-  },
-  "licenses": [{
+  "licenses": [
+    {
       "type": "MIT",
       "url": "http://www.opensource.org/licenses/mit-license.php"
-  }]
+    }
+  ]
 }
