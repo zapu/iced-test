@@ -413,7 +413,7 @@
           try {
             m = path.resolve(_this._dir, f);
             dat = require(m);
-            if (!dat.skip) {
+            if (dat.skip == null) {
               (function(__iced_k) {
                 __iced_deferrals = new iced.Deferrals(__iced_k, {
                   parent: ___iced_passed_deferral,

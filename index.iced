@@ -198,7 +198,7 @@ exports.ServerRunner = class ServerRunner extends Runner
     try
       m = path.resolve @_dir, f
       dat = require m
-      await @run_code f, dat, defer() unless dat.skip
+      await @run_code f, dat, defer() unless dat.skip?
     catch e
       @err "In reading #{m}: #{e}\n#{e.stack}"
     cb()
