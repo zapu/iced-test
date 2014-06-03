@@ -9,7 +9,7 @@
     "url": "https://github.com/maxtaco/iced-test.git"
   },
   "devDependencies": {
-    "iced-coffee-script": "^1.7.1-c",
+    "iced-coffee-script": "^1.7.1-c"
   },
   "dependencies": {
     "colors": ">=0.6.2",
