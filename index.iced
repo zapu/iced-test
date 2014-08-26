@@ -12,7 +12,7 @@ WAYPOINT = "\u2611"
 ##-----------------------------------------------------------------------
 
 sort_fn = (a,b) ->
-  if (m1 = a.match /^(\d+)_/)? and (m2 = b.match /^(\d+)_/)? 
+  if (m1 = a.match /^(\d+)_/)? and (m2 = b.match /^(\d+)_/)?
     parseInt(m1[1]) - parseInt(m2[1])
   else a.localeCompare(b)
 
@@ -31,24 +31,24 @@ exports.File = class File
 exports.Case = class Case
 
   ##-----------------------------------------
-  
+
   constructor : (@file) ->
     @_ok = true
 
   ##-----------------------------------------
-  
+
   search : (s, re, msg) ->
     @assert (s? and s.search(re) >= 0), msg
 
   ##-----------------------------------------
-  
+
   assert : (f, what) ->
     if not f
       @error "Assertion failed: #{what}"
       @_ok = false
 
   ##-----------------------------------------
-  
+
   equal : (a,b,what) ->
     if not deep_equal a, b
       [ja, jb] = [JSON.stringify(a), JSON.stringify(b)]
@@ -56,7 +56,7 @@ exports.Case = class Case
       @_ok = false
 
   ##-----------------------------------------
-  
+
   error : (e) ->
     @file.test_error_message e
     @_ok = false
@@ -69,20 +69,20 @@ exports.Case = class Case
       @_ok = false
 
   ##-----------------------------------------
-  
+
   is_ok : () -> @_ok
 
   ##-----------------------------------------
 
   waypoint : (m) -> @file.waypoint m
-  
+
 
 ##-----------------------------------------------------------------------
 
 class Runner
 
   ##-----------------------------------------
-  
+
   constructor : ->
     @_files = []
     @_launches = 0
@@ -91,9 +91,9 @@ class Runner
     @_rc = 0
     @_n_files = 0
     @_n_good_files = 0
- 
+
   ##-----------------------------------------
-  
+
   run_files : (cb) ->
     for f in @_files
       await @run_file f, defer()
@@ -102,18 +102,18 @@ class Runner
   ##-----------------------------------------
 
   new_file_obj : (fn) -> new File fn, @
-   
+
   ##-----------------------------------------
-  
+
   run_code : (fn, code, cb) ->
     fo = @new_file_obj fn
-    
+
     if code.init?
       await code.init fo.new_case(), defer err
     else
       await fo.default_init defer ok
       err = "failed to run default init" unless ok
-      
+
     destroy = code.destroy
     delete code["init"]
     delete code["destroy"]
@@ -134,12 +134,12 @@ class Runner
           @report_good_outcome "#{CHECK} #{fn}: #{k}"
         else
           @report_bad_outcome "#{BAD_X} #{fn}: #{k}"
-          
+
     if destroy?
       await destroy fo.new_case(), defer()
     else
       await fo.default_destroy defer()
-      
+
     cb()
 
   ##-----------------------------------------
@@ -153,7 +153,7 @@ class Runner
     opts.bold = true
 
     @log "Tests: #{@_successes}/#{@_tests} passed", opts
-    
+
     if @_n_files isnt @_n_good_files
       @err " -> Only #{@_n_good_files}/#{@_n_files} files ran properly", { bold : true }
     return @_rc
@@ -180,9 +180,9 @@ class Runner
 
   init : (cb) -> cb true
   finish : (cb) -> cb true
- 
+
   ##-----------------------------------------
-  
+
 ##-----------------------------------------------------------------------
 
 exports.ServerRunner = class ServerRunner extends Runner
@@ -193,7 +193,7 @@ exports.ServerRunner = class ServerRunner extends Runner
     super()
 
   ##-----------------------------------------
-  
+
   run_file : (f, cb) ->
     try
       m = path.resolve @_dir, f
@@ -212,16 +212,16 @@ exports.ServerRunner = class ServerRunner extends Runner
     console.log msg
 
   ##-----------------------------------------
-  
+
   load_files : ({mainfile, whitelist, files_dir}, cb) ->
-    
+
     wld = null
     if whitelist?
       wld = {}
       wld[k] = true for k in whitelist
-    
+
     @_dir = path.dirname mainfile
-    @_dir = path.join @_dir, files_dir if files_dir? 
+    @_dir = path.join @_dir, files_dir if files_dir?
     base = path.basename mainfile
     await fs.readdir @_dir, defer err, files
     if err?
@@ -234,7 +234,7 @@ exports.ServerRunner = class ServerRunner extends Runner
         @_files.push file
       @_files.sort sort_fn
     cb ok
-   
+
   #-------------------------------------
 
   report_good_outcome : (msg) -> console.log msg.green
@@ -248,7 +248,7 @@ exports.ServerRunner = class ServerRunner extends Runner
     await @run_files defer() if ok
     @report()
     await @finish defer ok
-    cb @_rc   
+    cb @_rc
 
 ##-----------------------------------------------------------------------
 
@@ -264,7 +264,7 @@ exports.BrowserRunner = class BrowserRunner extends Runner
   ##-----------------------------------------
 
   log : (m, {red, green, bold}) ->
-    style = 
+    style =
       margin : "0px"
     style.color = "green" if green
     style.color = "red" if red
@@ -286,9 +286,10 @@ exports.BrowserRunner = class BrowserRunner extends Runner
 
 ##-----------------------------------------------------------------------
 
-exports.run = run = ({mainfile, klass, whitelist, files_dir}) ->
-  klass = ServerRunner unless klass?
-  runner = new klass()
+exports.run = run = ({mainfile, klass, whitelist, files_dir, runner}) ->
+  unless runner?
+    klass = ServerRunner unless klass?
+    runner = new klass()
   await runner.run { mainfile, whitelist, files_dir }, defer rc
   process.exit rc
 
