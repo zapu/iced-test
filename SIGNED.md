@@ -4,13 +4,13 @@
 Version: GnuPG/MacGPG2 v2.0.22 (Darwin)
 Comment: GPGTools - https://gpgtools.org
 
-iQEcBAABCgAGBQJT/MhpAAoJEJgKPw0B/gTfJgoH/07wKkw1yghnoFoybDNWghDB
-hctN1iItafeEyAcoPlAWbND7TDO8jxVuClvG7LldYgLL45RCGc8pjIhBEjgNj5Wn
-Kg1z1+XSBdIetPf/nH2ywArkwC2P14CFuGMgr5wB8pJhK83sCf6+7J/eQpEvviHU
-CaDcWz00EC6qUzYQQ24Xad8lCJbypyAwWurmLGL6dpzwK2lZ+uevNdlHlS39/jjU
-GEqBxBgGAONNv1WZYHHdriL05SN9CEmuATZdZqpGHy1KL/g2VAxPFCPz8PCgZC92
-PsItjBLVNF/sEZbW6/vHPdg+ZFMEl9Xlz8zwsw5h4TtNNdxpo91sbS1sCQgL6ps=
-=F0vw
+iQEcBAABCgAGBQJT/M2yAAoJEJgKPw0B/gTffyEH/33GHBZg6V46RguX2EqFTBlL
+pWNTZPi/5Skj7t3kqpCc051/qlfwgB/STBg6D7oI6h1Q/e8RiQkhD/2groySLDQ4
+hrySTRjsuVANMSydUjNCoLiPh/MjFJzP5cNUgx5iDHo0WKPnUeSdx3KbiYmqRz8U
+W36cVb9wvsnsL3FDQoMxSNoFQgHp7ML0ccRwipJxJ7l3AQ+46/ZHR/Y7emBiAyFt
+wp4snL0c0zrYMLylVLOu4sHXzAYzuZ1u1+Wtjp8Aoj3ieddsyzc/vQ8uG2f/mT+b
+crbY84mJTMjHdSIjRp9t2+O17WC1MDSDdKSf8EVYsZ0iOJHJCkz6mOevg1sHclk=
+=o4H2
 -----END PGP SIGNATURE-----
 
 ```
@@ -28,9 +28,9 @@ size   exec  file            contents
 206            Makefile      fe36113d39382362b2118a18b836d4a35c091cebf4b96449765ce33341cc0bc2
 93             README.md     d0f2182a445e9d2d096307c0cf9c729f553e059a15e1208158ea38ae27c3499d
 7589           index.iced    062ad36450d49b99fbc96e08f6f02849d1609e4e500bbb465a72fb0aea2a9319
-25907          index.js      46afd306cd256022919b3d092d60fe8c5ef81bd91550d34aabb2fe9566d6285c
-12237          index.map     b85c15a376ac3fb97754292710c98a821baf5051686e672975122ad968b5d3bf
-609            package.json  0986852852de8b60251386ec83bc4e97aeccd346caf08caa3dd37d749ff1d33f
+25985          index.js      96fdaef231a3cb542fde971cec534fe6377b3884150d831bbba8895f3c50bba4
+12272          index.map     4c136f49dbc684108906988810fd3bd38c77dc4e1c12c480bfb5cfb9485ef676
+609            package.json  371dbb5241502d9078c8f41264b6f7dec9718504ce2617e9cc4e347c7d6a4993
 ```
 
 #### Ignore
