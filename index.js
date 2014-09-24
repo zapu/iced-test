@@ -111,7 +111,7 @@
             _this._ok = false;
             return cb_bad();
           } else {
-            return cb_good.apply(null, [null].concat(__slice.call(args)));
+            return cb_good.apply(null, args);
           }
         };
       })(this);

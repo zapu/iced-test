@@ -77,7 +77,7 @@ exports.Case = class Case
         @_ok = false
         cb_bad()
       else
-        cb_good null, args...
+        cb_good args...
 
   ##-----------------------------------------
 
