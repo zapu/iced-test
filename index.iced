@@ -70,6 +70,17 @@ exports.Case = class Case
 
   ##-----------------------------------------
 
+  esc : (cb_good, cb_bad, msg) ->
+    (err, args...) =>
+      if err?
+        @error (if msg? then (msg + ": ") else "") + err.toString()
+        @_ok = false
+        cb_bad()
+      else
+        cb_good null, args...
+
+  ##-----------------------------------------
+
   is_ok : () -> @_ok
 
   ##-----------------------------------------
