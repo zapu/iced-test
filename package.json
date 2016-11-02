@@ -9,12 +9,12 @@
     "url": "https://github.com/maxtaco/iced-test.git"
   },
   "devDependencies": {
-    "iced-coffee-script": "^1.7.1-c"
+    "iced-coffee-script": "^108.0.11"
   },
   "dependencies": {
     "colors": ">=0.6.2",
     "deep-equal": ">=0.2.1",
-    "iced-runtime": ">=0.0.1",
+    "iced-runtime": "^1.0.3",
     "minimist": ">=0.0.8"
   },
   "licenses": [

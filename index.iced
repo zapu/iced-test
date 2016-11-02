@@ -141,7 +141,15 @@ class Runner
       for k,v of code
         @_tests++
         C = fo.new_case()
-        await v C, defer err
+        await
+          # If we crash before we hit the main event loop, we
+          # have to recover and error out here; otherwise, the
+          # error is lost and the program cleanly terminates.
+          try
+            v C, defer err
+          catch e
+            @err "In #{fn}/#{k}: #{e}"
+            return cb()
         if err
           @err "In #{fn}/#{k}: #{err}"
         else if C.is_ok()
