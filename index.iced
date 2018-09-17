@@ -156,7 +156,7 @@ class Runner
           @_successes++
           @report_good_outcome "#{CHECK} #{fn}: #{k}"
         else
-          @report_bad_outcome "#{BAD_X} #{fn}: #{k}"
+          @report_bad_outcome "#{BAD_X} TESTFAIL #{fn}: #{k}"
 
     if destroy?
       await destroy fo.new_case(), defer()

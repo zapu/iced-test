@@ -307,7 +307,7 @@
                       }
                       __iced_deferrals._fulfill();
                     })(function() {
-                      return _next(err ? _this.err("In " + fn + "/" + k + ": " + err) : C.is_ok() ? (_this._successes++, _this.report_good_outcome("" + CHECK + " " + fn + ": " + k)) : _this.report_bad_outcome("" + BAD_X + " " + fn + ": " + k));
+                      return _next(err ? _this.err("In " + fn + "/" + k + ": " + err) : C.is_ok() ? (_this._successes++, _this.report_good_outcome("" + CHECK + " " + fn + ": " + k)) : _this.report_bad_outcome("" + BAD_X + " TESTFAIL " + fn + ": " + k));
                     });
                   }
                 };
