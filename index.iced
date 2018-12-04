@@ -28,6 +28,14 @@ exports.File = class File
 
 ##-----------------------------------------------------------------------
 
+run_test_case_with_catch = (code, case_obj, cb) ->
+  try
+    code case_obj, cb
+  catch e
+    cb e
+
+##-----------------------------------------------------------------------
+
 exports.Case = class Case
 
   ##-----------------------------------------
@@ -141,18 +149,19 @@ class Runner
       for k,v of code
         @_tests++
         C = fo.new_case()
+        hit_error = false
+
         await
           # If we crash before we hit the main event loop, we
           # have to recover and error out here; otherwise, the
           # error is lost and the program cleanly terminates.
-          try
-            v C, defer err
-          catch e
-            @err "In #{fn}/#{k}: #{e}"
-            return cb()
+          run_test_case_with_catch v, C, defer err
+
         if err
           @err "In #{fn}/#{k}: #{err}"
-        else if C.is_ok()
+          hit_error = true
+
+        if C.is_ok() and not hit_error
           @_successes++
           @report_good_outcome "#{CHECK} #{fn}: #{k}"
         else
