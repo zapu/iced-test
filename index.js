@@ -191,7 +191,7 @@
               (function(__iced_k) {
                 __iced_deferrals = new iced.Deferrals(__iced_k, {
                   parent: ___iced_passed_deferral,
-                  filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+                  filename: "/home/zapu/Projects/iced-test/index.iced",
                   funcname: "Runner.run_files"
                 });
                 _this.run_file(f, __iced_deferrals.defer({
@@ -287,7 +287,7 @@
             (function(__iced_k) {
               __iced_deferrals = new iced.Deferrals(__iced_k, {
                 parent: ___iced_passed_deferral,
-                filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+                filename: "/home/zapu/Projects/iced-test/index.iced",
                 funcname: "Runner.run_code"
               });
               _this.run_test_case_guarded(code.init, fo.new_case(), __iced_deferrals.defer({
@@ -304,7 +304,7 @@
             (function(__iced_k) {
               __iced_deferrals = new iced.Deferrals(__iced_k, {
                 parent: ___iced_passed_deferral,
-                filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+                filename: "/home/zapu/Projects/iced-test/index.iced",
                 funcname: "Runner.run_code"
               });
               fo.default_init(__iced_deferrals.defer({
@@ -367,7 +367,7 @@
                     (function(__iced_k) {
                       __iced_deferrals = new iced.Deferrals(__iced_k, {
                         parent: ___iced_passed_deferral,
-                        filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+                        filename: "/home/zapu/Projects/iced-test/index.iced",
                         funcname: "Runner.run_code"
                       });
                       _this.run_test_case_guarded(func, C, __iced_deferrals.defer({
@@ -398,7 +398,7 @@
                 (function(__iced_k) {
                   __iced_deferrals = new iced.Deferrals(__iced_k, {
                     parent: ___iced_passed_deferral,
-                    filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+                    filename: "/home/zapu/Projects/iced-test/index.iced",
                     funcname: "Runner.run_code"
                   });
                   _this.run_test_case_guarded(destroy, fo.new_case(), __iced_deferrals.defer({
@@ -415,7 +415,7 @@
                 (function(__iced_k) {
                   __iced_deferrals = new iced.Deferrals(__iced_k, {
                     parent: ___iced_passed_deferral,
-                    filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+                    filename: "/home/zapu/Projects/iced-test/index.iced",
                     funcname: "Runner.run_code"
                   });
                   fo.default_destroy(__iced_deferrals.defer({
@@ -540,7 +540,7 @@
               (function(__iced_k) {
                 __iced_deferrals = new iced.Deferrals(__iced_k, {
                   parent: ___iced_passed_deferral,
-                  filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+                  filename: "/home/zapu/Projects/iced-test/index.iced",
                   funcname: "ServerRunner.run_file"
                 });
                 _this.run_code(f, dat, __iced_deferrals.defer({
@@ -553,7 +553,9 @@
             }
           } catch (_error) {
             e = _error;
-            return _this.err("In reading " + m + ": " + e + "\n" + e.stack);
+            _this.err("When compiling test file '" + f + "' (not running yet):");
+            _this.err("In reading " + m + ": " + e + "\n" + e.stack);
+            return cb(e);
           }
         });
       })(this)((function(_this) {
@@ -600,7 +602,7 @@
         return (function(__iced_k) {
           __iced_deferrals = new iced.Deferrals(__iced_k, {
             parent: ___iced_passed_deferral,
-            filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+            filename: "/home/zapu/Projects/iced-test/index.iced",
             funcname: "ServerRunner.load_files"
           });
           fs.readdir(_this._dir, __iced_deferrals.defer({
@@ -610,7 +612,7 @@
                 return files = arguments[1];
               };
             })(),
-            lineno: 321
+            lineno: 326
           }));
           __iced_deferrals._fulfill();
         });
@@ -652,7 +654,7 @@
         return (function(__iced_k) {
           __iced_deferrals = new iced.Deferrals(__iced_k, {
             parent: ___iced_passed_deferral,
-            filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+            filename: "/home/zapu/Projects/iced-test/index.iced",
             funcname: "ServerRunner.run"
           });
           _this.init(__iced_deferrals.defer({
@@ -661,7 +663,7 @@
                 return ok = arguments[0];
               };
             })(),
-            lineno: 341
+            lineno: 346
           }));
           __iced_deferrals._fulfill();
         });
@@ -672,7 +674,7 @@
               (function(__iced_k) {
                 __iced_deferrals = new iced.Deferrals(__iced_k, {
                   parent: ___iced_passed_deferral,
-                  filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+                  filename: "/home/zapu/Projects/iced-test/index.iced",
                   funcname: "ServerRunner.run"
                 });
                 _this.load_files(opts, __iced_deferrals.defer({
@@ -681,7 +683,7 @@
                       return ok = arguments[0];
                     };
                   })(),
-                  lineno: 342
+                  lineno: 347
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -694,11 +696,11 @@
                 (function(__iced_k) {
                   __iced_deferrals = new iced.Deferrals(__iced_k, {
                     parent: ___iced_passed_deferral,
-                    filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+                    filename: "/home/zapu/Projects/iced-test/index.iced",
                     funcname: "ServerRunner.run"
                   });
                   _this.run_files(__iced_deferrals.defer({
-                    lineno: 343
+                    lineno: 348
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -710,7 +712,7 @@
               (function(__iced_k) {
                 __iced_deferrals = new iced.Deferrals(__iced_k, {
                   parent: ___iced_passed_deferral,
-                  filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+                  filename: "/home/zapu/Projects/iced-test/index.iced",
                   funcname: "ServerRunner.run"
                 });
                 _this.finish(__iced_deferrals.defer({
@@ -719,7 +721,7 @@
                       return ok = arguments[0];
                     };
                   })(),
-                  lineno: 345
+                  lineno: 350
                 }));
                 __iced_deferrals._fulfill();
               })(function() {
@@ -784,7 +786,7 @@
         return (function(__iced_k) {
           __iced_deferrals = new iced.Deferrals(__iced_k, {
             parent: ___iced_passed_deferral,
-            filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+            filename: "/home/zapu/Projects/iced-test/index.iced",
             funcname: "BrowserRunner.run"
           });
           _this.init(__iced_deferrals.defer({
@@ -793,7 +795,7 @@
                 return ok = arguments[0];
               };
             })(),
-            lineno: 374
+            lineno: 379
           }));
           __iced_deferrals._fulfill();
         });
@@ -830,7 +832,7 @@
                   (function(__iced_k) {
                     __iced_deferrals = new iced.Deferrals(__iced_k, {
                       parent: ___iced_passed_deferral,
-                      filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+                      filename: "/home/zapu/Projects/iced-test/index.iced",
                       funcname: "BrowserRunner.run"
                     });
                     _this.run_code(k, v, __iced_deferrals.defer({
@@ -839,7 +841,7 @@
                           return ok = arguments[0];
                         };
                       })(),
-                      lineno: 376
+                      lineno: 381
                     }));
                     __iced_deferrals._fulfill();
                   })(_next);
@@ -854,7 +856,7 @@
             (function(__iced_k) {
               __iced_deferrals = new iced.Deferrals(__iced_k, {
                 parent: ___iced_passed_deferral,
-                filename: "/Users/michal/keybaseOther/iced-test/index.iced",
+                filename: "/home/zapu/Projects/iced-test/index.iced",
                 funcname: "BrowserRunner.run"
               });
               _this.finish(__iced_deferrals.defer({
@@ -863,7 +865,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 378
+                lineno: 383
               }));
               __iced_deferrals._fulfill();
             })(function() {
@@ -894,7 +896,7 @@
       return (function(__iced_k) {
         __iced_deferrals = new iced.Deferrals(__iced_k, {
           parent: ___iced_passed_deferral,
-          filename: "/Users/michal/keybaseOther/iced-test/index.iced"
+          filename: "/home/zapu/Projects/iced-test/index.iced"
         });
         runner.run({
           mainfile: mainfile,
@@ -906,7 +908,7 @@
               return rc = arguments[0];
             };
           })(),
-          lineno: 388
+          lineno: 393
         }));
         __iced_deferrals._fulfill();
       });

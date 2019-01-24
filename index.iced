@@ -296,7 +296,12 @@ exports.ServerRunner = class ServerRunner extends Runner
       dat = require m
       await @run_code f, dat, defer() unless dat.skip?
     catch e
+      @err "When compiling test file '#{f}' (not running yet):"
       @err "In reading #{m}: #{e}\n#{e.stack}"
+      # Iced miscompilation workaround - if ended up in the catch block,
+      # it wouldn't exit it to call cb. So we call it again here, but do
+      # return as well for when the iced bug is fixed.
+      return cb e
     cb()
 
   ##-----------------------------------------
