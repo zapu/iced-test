@@ -32,60 +32,6 @@ exports.File = class File
 
 ##-----------------------------------------------------------------------
 
-run_test_case_guarded = (code, case_obj, gcb) ->
-  remove_uncaught = () ->
-  timeoutObj = null
-  cb_called = false
-  cb = () =>
-    if timeoutObj
-      clearTimeout(timeoutObj)
-      timeoutObj = null
-
-    unless cb_called
-      cb_called = true
-      remove_uncaught()
-      gcb.apply @, arguments
-
-  if process
-    # "On Error Resume Next"
-    # This is needed, because otherwise testing is stopped after first
-    # failed async test. We want to continue as far as we can, even if in
-    # unstable state (test run is considered "failed" from now on anyway).
-    remove_uncaught = () -> process.removeAllListeners 'uncaughtException'
-    remove_uncaught()
-    process.on 'uncaughtException', (err) ->
-      console.log ":: Recovering from async exception: #{err}"
-      console.log ":: Testing may become unstable from now on."
-      try
-        if callsite = get_outside_callsite_stackline(err)
-          console.log callsite
-        else
-          console.log err.stack
-      cb err
-
-  timeoutFunc = () ->
-    unless cb_called
-      console.log ":: Recovering from a timeout in test function."
-      console.log ":: Testing may become unstable from now on."
-      timeoutObj = null # So `cb` does not clear timeout that just fired.
-      cb new Error "timeout"
-  timeoutObj = setTimeout timeoutFunc, 60 * 1000
-
-  try
-    # If we crash before we hit the main event loop, we have to recover and
-    # error out here; otherwise, the error is lost and the program cleanly
-    # terminates.
-    code case_obj, cb
-  catch err
-    console.log ":: Caught sync exception: #{err}"
-    if callsite = get_outside_callsite_stackline(err)
-      console.log callsite
-    else
-      console.log err.stack
-    cb err
-
-##-----------------------------------------------------------------------
-
 exports.Case = class Case
 
   ##-----------------------------------------
@@ -167,6 +113,9 @@ class Runner
     @_n_files = 0
     @_n_good_files = 0
 
+    @_file_states = {} # filename -> true (passed) / false (failed)
+    @_failures = []
+
   ##-----------------------------------------
 
   run_files : (cb) ->
@@ -180,11 +129,64 @@ class Runner
 
   ##-----------------------------------------
 
+  run_test_case_guarded : (code, case_obj, gcb) ->
+    remove_uncaught = () ->
+    timeoutObj = null
+    cb_called = false
+    cb = () =>
+      if timeoutObj
+        clearTimeout(timeoutObj)
+        timeoutObj = null
+
+      unless cb_called
+        cb_called = true
+        remove_uncaught()
+        gcb.apply @, arguments
+
+    if @uncaughtException
+      # "On Error Resume Next"
+      # This is needed, because otherwise testing is stopped after first
+      # failed async test. We want to continue as far as we can, even if in
+      # unstable state (test run is considered "failed" from now on anyway).
+      remove_uncaught = () -> process.removeAllListeners 'uncaughtException'
+      remove_uncaught()
+      process.on 'uncaughtException', (err) ->
+        console.log ":: Recovering from async exception: #{err}"
+        console.log ":: Testing may become unstable from now on."
+        try
+          if callsite = get_outside_callsite_stackline(err)
+            console.log callsite
+          else
+            console.log err.stack
+        cb err
+
+    if @timeoutMs
+      timeoutFunc = () ->
+        unless cb_called
+          console.log ":: Recovering from a timeout in test function."
+          console.log ":: Testing may become unstable from now on."
+          timeoutObj = null # So `cb` does not clear timeout that just fired.
+          cb new Error "timeout"
+      timeoutObj = setTimeout timeoutFunc, @timeoutMs
+
+    try
+      # If we crash before we hit the main event loop, we have to recover and
+      # error out here; otherwise, the error is lost and the program cleanly
+      # terminates.
+      code case_obj, cb
+    catch err
+      console.log ":: Caught sync exception: #{err}"
+      if callsite = get_outside_callsite_stackline(err)
+        console.log callsite
+      else
+        console.log err.stack
+      cb err
+
   run_code : (fn, code, cb) ->
     fo = @new_file_obj fn
 
     if code.init?
-      await run_test_case_guarded code.init, fo.new_case(), defer err
+      await @run_test_case_guarded code.init, fo.new_case(), defer err
     else
       await fo.default_init defer ok
       err = "failed to run default init" unless ok
@@ -194,31 +196,36 @@ class Runner
     delete code["destroy"]
 
     @_n_files++
+    hit_any_error = false
     if err
       @err "Failed to initialize file #{fn}: #{err}"
     else
       @_n_good_files++
-      for k,v of code
+      for k,func of code
         @_tests++
         C = fo.new_case()
         hit_error = false
 
-        await run_test_case_guarded v, C, defer err
+        await @run_test_case_guarded func, C, defer err
 
         if err
           @err "In #{fn}/#{k}: #{err}"
           hit_error = true
+          hit_any_error = true
 
         if C.is_ok() and not hit_error
           @_successes++
           @report_good_outcome "#{CHECK} #{fn}: #{k}"
         else
-          @report_bad_outcome "#{BAD_X} TESTFAIL #{fn}: #{k}"
+          @report_bad_outcome outcome = "#{BAD_X} TESTFAIL #{fn}: #{k}"
+          @_failures.push outcome
 
     if destroy?
-      await run_test_case_guarded destroy, fo.new_case(), defer err
+      await @run_test_case_guarded destroy, fo.new_case(), defer err
     else
       await fo.default_destroy defer()
+
+    @_file_states[fn] = not hit_any_error
 
     cb err
 
@@ -236,6 +243,11 @@ class Runner
 
     if @_n_files isnt @_n_good_files
       @err " -> Only #{@_n_good_files}/#{@_n_files} files ran properly", { bold : true }
+
+    if @_failures.length
+      @log "Failed in files (pass as arguments to runner to retry):", { red : true }
+      @log "  " + (k for k,v of @_file_states when not v).join(' '), {}
+      @log "", {}
     return @_rc
 
   ##-----------------------------------------
