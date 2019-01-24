@@ -32,10 +32,14 @@
 
   get_outside_callsite_stackline = function(err) {
     var stacklines, _ref;
-    stacklines = (err != null ? err : new Error()).stack.split('\n').slice(1).filter(function(x) {
-      return x.indexOf(module.filename) === -1;
-    });
-    return (_ref = stacklines[0]) != null ? _ref.trim() : void 0;
+    if (typeof module !== "undefined" && module !== null ? module.filename : void 0) {
+      stacklines = (err != null ? err : new Error()).stack.split('\n').slice(1).filter(function(x) {
+        return x.indexOf(module.filename) === -1;
+      });
+      return (_ref = stacklines[0]) != null ? _ref.trim() : void 0;
+    } else {
+      return null;
+    }
   };
 
   exports.File = File = (function() {
@@ -191,7 +195,7 @@
                   funcname: "Runner.run_files"
                 });
                 _this.run_file(f, __iced_deferrals.defer({
-                  lineno: 122
+                  lineno: 125
                 }));
                 __iced_deferrals._fulfill();
               })(_next);
@@ -292,7 +296,7 @@
                     return err = arguments[0];
                   };
                 })(),
-                lineno: 188
+                lineno: 191
               }));
               __iced_deferrals._fulfill();
             })(__iced_k);
@@ -309,7 +313,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 190
+                lineno: 193
               }));
               __iced_deferrals._fulfill();
             })(function() {
@@ -326,7 +330,8 @@
           hit_any_error = false;
           (function(__iced_k) {
             if (err) {
-              return __iced_k(_this.err("Failed to initialize file " + fn + ": " + err));
+              _this.err("Failed to initialize file " + fn + ": " + err);
+              return __iced_k(hit_any_error = true);
             } else {
               _this._n_good_files++;
               (function(__iced_k) {
@@ -371,7 +376,7 @@
                             return err = arguments[0];
                           };
                         })(),
-                        lineno: 208
+                        lineno: 212
                       }));
                       __iced_deferrals._fulfill();
                     })(function() {
@@ -402,7 +407,7 @@
                         return err = arguments[0];
                       };
                     })(),
-                    lineno: 223
+                    lineno: 227
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -414,13 +419,13 @@
                     funcname: "Runner.run_code"
                   });
                   fo.default_destroy(__iced_deferrals.defer({
-                    lineno: 225
+                    lineno: 229
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
               }
             })(function() {
-              _this._file_states[fn] = !hit_any_error;
+              _this._file_states[fn] = !hit_any_error && !err;
               return cb(err);
             });
           });
@@ -539,7 +544,7 @@
                   funcname: "ServerRunner.run_file"
                 });
                 _this.run_code(f, dat, __iced_deferrals.defer({
-                  lineno: 292
+                  lineno: 296
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -605,7 +610,7 @@
                 return files = arguments[1];
               };
             })(),
-            lineno: 317
+            lineno: 321
           }));
           __iced_deferrals._fulfill();
         });
@@ -656,7 +661,7 @@
                 return ok = arguments[0];
               };
             })(),
-            lineno: 337
+            lineno: 341
           }));
           __iced_deferrals._fulfill();
         });
@@ -676,7 +681,7 @@
                       return ok = arguments[0];
                     };
                   })(),
-                  lineno: 338
+                  lineno: 342
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -693,7 +698,7 @@
                     funcname: "ServerRunner.run"
                   });
                   _this.run_files(__iced_deferrals.defer({
-                    lineno: 339
+                    lineno: 343
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -714,7 +719,7 @@
                       return ok = arguments[0];
                     };
                   })(),
-                  lineno: 341
+                  lineno: 345
                 }));
                 __iced_deferrals._fulfill();
               })(function() {
@@ -788,7 +793,7 @@
                 return ok = arguments[0];
               };
             })(),
-            lineno: 370
+            lineno: 374
           }));
           __iced_deferrals._fulfill();
         });
@@ -834,7 +839,7 @@
                           return ok = arguments[0];
                         };
                       })(),
-                      lineno: 372
+                      lineno: 376
                     }));
                     __iced_deferrals._fulfill();
                   })(_next);
@@ -858,7 +863,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 374
+                lineno: 378
               }));
               __iced_deferrals._fulfill();
             })(function() {
@@ -901,7 +906,7 @@
               return rc = arguments[0];
             };
           })(),
-          lineno: 384
+          lineno: 388
         }));
         __iced_deferrals._fulfill();
       });

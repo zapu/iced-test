@@ -16,9 +16,12 @@ sort_fn = (a,b) ->
 ##-----------------------------------------------------------------------
 
 get_outside_callsite_stackline = (err) ->
-  # Find first stackline without iced-test filename.
-  stacklines = (err ? new Error()).stack.split('\n').slice(1).filter (x) -> x.indexOf(module.filename) is -1
-  return stacklines[0]?.trim()
+  if module?.filename
+    # Find first stackline without iced-test filename.
+    stacklines = (err ? new Error()).stack.split('\n').slice(1).filter (x) -> x.indexOf(module.filename) is -1
+    return stacklines[0]?.trim()
+  else
+    return null
 
 ##-----------------------------------------------------------------------
 
@@ -199,6 +202,7 @@ class Runner
     hit_any_error = false
     if err
       @err "Failed to initialize file #{fn}: #{err}"
+      hit_any_error = true
     else
       @_n_good_files++
       for k,func of code
@@ -225,7 +229,7 @@ class Runner
     else
       await fo.default_destroy defer()
 
-    @_file_states[fn] = not hit_any_error
+    @_file_states[fn] = not hit_any_error and not err
 
     cb err
 
