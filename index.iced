@@ -1,9 +1,6 @@
-
 fs = require 'fs'
 path = require 'path'
-colors = require 'colors'
 deep_equal = require 'deep-equal'
-urlmod = require 'url'
 
 CHECK = "\u2714"
 BAD_X = "\u2716"
@@ -28,11 +25,35 @@ exports.File = class File
 
 ##-----------------------------------------------------------------------
 
-run_test_case_with_catch = (code, case_obj, cb) ->
+run_test_case_with_catch = (code, case_obj, gcb) ->
+  remove_uncaught = () ->
+  cb_called = false
+  cb = () =>
+    unless cb_called
+      cb_called = true
+      remove_uncaught()
+      gcb.apply @, arguments
+
+  if process
+    # "On Error Resume Next"
+    # This is needed, because otherwise testing is stopped after first
+    # failed async test. We want to continue as far as we can, even if in
+    # unstable state (test run is considered "failed" from now on anyway).
+    remove_uncaught = () -> process.removeAllListeners 'uncaughtException'
+    remove_uncaught()
+    process.on 'uncaughtException', (err) ->
+      console.log ":: Recovering from async exception: #{err}"
+      console.log ":: Testing may become unstable from now on."
+      cb err
+
   try
+    # If we crash before we hit the main event loop, we have to recover and
+    # error out here; otherwise, the error is lost and the program cleanly
+    # terminates.
     code case_obj, cb
-  catch e
-    cb e
+  catch err
+    console.log ":: Caught sync exception: #{err}"
+    cb err
 
 ##-----------------------------------------------------------------------
 
@@ -132,7 +153,7 @@ class Runner
     fo = @new_file_obj fn
 
     if code.init?
-      await code.init fo.new_case(), defer err
+      await run_test_case_with_catch code.init, fo.new_case(), defer err
     else
       await fo.default_init defer ok
       err = "failed to run default init" unless ok
@@ -151,11 +172,7 @@ class Runner
         C = fo.new_case()
         hit_error = false
 
-        await
-          # If we crash before we hit the main event loop, we
-          # have to recover and error out here; otherwise, the
-          # error is lost and the program cleanly terminates.
-          run_test_case_with_catch v, C, defer err
+        await run_test_case_with_catch v, C, defer err
 
         if err
           @err "In #{fn}/#{k}: #{err}"
@@ -168,11 +185,11 @@ class Runner
           @report_bad_outcome "#{BAD_X} TESTFAIL #{fn}: #{k}"
 
     if destroy?
-      await destroy fo.new_case(), defer()
+      await run_test_case_with_catch destroy, fo.new_case(), defer err
     else
       await fo.default_destroy defer()
 
-    cb()
+    cb err
 
   ##-----------------------------------------
 
