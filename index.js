@@ -30,9 +30,9 @@
     }
   };
 
-  get_outside_callsite_stackline = function() {
+  get_outside_callsite_stackline = function(err) {
     var stacklines, _ref;
-    stacklines = new Error().stack.split('\n').slice(1).filter(function(x) {
+    stacklines = (err != null ? err : new Error()).stack.split('\n').slice(1).filter(function(x) {
       return x.indexOf(module.filename) === -1;
     });
     return (_ref = stacklines[0]) != null ? _ref.trim() : void 0;
@@ -69,7 +69,7 @@
   })();
 
   run_test_case_guarded = function(code, case_obj, gcb) {
-    var cb, cb_called, err, remove_uncaught, timeoutFunc, timeoutObj;
+    var callsite, cb, cb_called, err, remove_uncaught, timeoutFunc, timeoutObj;
     remove_uncaught = function() {};
     timeoutObj = null;
     cb_called = false;
@@ -92,8 +92,16 @@
       };
       remove_uncaught();
       process.on('uncaughtException', function(err) {
+        var callsite;
         console.log(":: Recovering from async exception: " + err);
         console.log(":: Testing may become unstable from now on.");
+        try {
+          if (callsite = get_outside_callsite_stackline(err)) {
+            console.log(callsite);
+          } else {
+            console.log(err.stack);
+          }
+        } catch (_error) {}
         return cb(err);
       });
     }
@@ -111,6 +119,11 @@
     } catch (_error) {
       err = _error;
       console.log(":: Caught sync exception: " + err);
+      if (callsite = get_outside_callsite_stackline(err)) {
+        console.log(callsite);
+      } else {
+        console.log(err.stack);
+      }
       return cb(err);
     }
   };
@@ -236,7 +249,7 @@
                   funcname: "Runner.run_files"
                 });
                 _this.run_file(f, __iced_deferrals.defer({
-                  lineno: 164
+                  lineno: 173
                 }));
                 __iced_deferrals._fulfill();
               })(_next);
@@ -275,7 +288,7 @@
                     return err = arguments[0];
                   };
                 })(),
-                lineno: 177
+                lineno: 186
               }));
               __iced_deferrals._fulfill();
             })(__iced_k);
@@ -292,7 +305,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 179
+                lineno: 188
               }));
               __iced_deferrals._fulfill();
             })(function() {
@@ -353,7 +366,7 @@
                             return err = arguments[0];
                           };
                         })(),
-                        lineno: 196
+                        lineno: 205
                       }));
                       __iced_deferrals._fulfill();
                     })(function() {
@@ -383,7 +396,7 @@
                         return err = arguments[0];
                       };
                     })(),
-                    lineno: 209
+                    lineno: 218
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -395,7 +408,7 @@
                     funcname: "Runner.run_code"
                   });
                   fo.default_destroy(__iced_deferrals.defer({
-                    lineno: 211
+                    lineno: 220
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -501,7 +514,7 @@
                   funcname: "ServerRunner.run_file"
                 });
                 _this.run_code(f, dat, __iced_deferrals.defer({
-                  lineno: 271
+                  lineno: 280
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -567,7 +580,7 @@
                 return files = arguments[1];
               };
             })(),
-            lineno: 296
+            lineno: 305
           }));
           __iced_deferrals._fulfill();
         });
@@ -618,7 +631,7 @@
                 return ok = arguments[0];
               };
             })(),
-            lineno: 316
+            lineno: 325
           }));
           __iced_deferrals._fulfill();
         });
@@ -638,7 +651,7 @@
                       return ok = arguments[0];
                     };
                   })(),
-                  lineno: 317
+                  lineno: 326
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -655,7 +668,7 @@
                     funcname: "ServerRunner.run"
                   });
                   _this.run_files(__iced_deferrals.defer({
-                    lineno: 318
+                    lineno: 327
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -676,7 +689,7 @@
                       return ok = arguments[0];
                     };
                   })(),
-                  lineno: 320
+                  lineno: 329
                 }));
                 __iced_deferrals._fulfill();
               })(function() {
@@ -750,7 +763,7 @@
                 return ok = arguments[0];
               };
             })(),
-            lineno: 349
+            lineno: 358
           }));
           __iced_deferrals._fulfill();
         });
@@ -796,7 +809,7 @@
                           return ok = arguments[0];
                         };
                       })(),
-                      lineno: 351
+                      lineno: 360
                     }));
                     __iced_deferrals._fulfill();
                   })(_next);
@@ -820,7 +833,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 353
+                lineno: 362
               }));
               __iced_deferrals._fulfill();
             })(function() {
@@ -863,7 +876,7 @@
               return rc = arguments[0];
             };
           })(),
-          lineno: 363
+          lineno: 372
         }));
         __iced_deferrals._fulfill();
       });

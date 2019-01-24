@@ -15,9 +15,9 @@ sort_fn = (a,b) ->
 
 ##-----------------------------------------------------------------------
 
-get_outside_callsite_stackline = () ->
+get_outside_callsite_stackline = (err) ->
   # Find first stackline without iced-test filename.
-  stacklines = new Error().stack.split('\n').slice(1).filter (x) -> x.indexOf(module.filename) is -1
+  stacklines = (err ? new Error()).stack.split('\n').slice(1).filter (x) -> x.indexOf(module.filename) is -1
   return stacklines[0]?.trim()
 
 ##-----------------------------------------------------------------------
@@ -56,6 +56,11 @@ run_test_case_guarded = (code, case_obj, gcb) ->
     process.on 'uncaughtException', (err) ->
       console.log ":: Recovering from async exception: #{err}"
       console.log ":: Testing may become unstable from now on."
+      try
+        if callsite = get_outside_callsite_stackline(err)
+          console.log callsite
+        else
+          console.log err.stack
       cb err
 
   timeoutFunc = () ->
@@ -73,6 +78,10 @@ run_test_case_guarded = (code, case_obj, gcb) ->
     code case_obj, cb
   catch err
     console.log ":: Caught sync exception: #{err}"
+    if callsite = get_outside_callsite_stackline(err)
+      console.log callsite
+    else
+      console.log err.stack
     cb err
 
 ##-----------------------------------------------------------------------
