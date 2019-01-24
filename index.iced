@@ -32,10 +32,15 @@ exports.File = class File
 
 ##-----------------------------------------------------------------------
 
-run_test_case_with_catch = (code, case_obj, gcb) ->
+run_test_case_guarded = (code, case_obj, gcb) ->
   remove_uncaught = () ->
+  timeoutObj = null
   cb_called = false
   cb = () =>
+    if timeoutObj
+      clearTimeout(timeoutObj)
+      timeoutObj = null
+
     unless cb_called
       cb_called = true
       remove_uncaught()
@@ -52,6 +57,14 @@ run_test_case_with_catch = (code, case_obj, gcb) ->
       console.log ":: Recovering from async exception: #{err}"
       console.log ":: Testing may become unstable from now on."
       cb err
+
+  timeoutFunc = () ->
+    unless cb_called
+      console.log ":: Recovering from a timeout in test function."
+      console.log ":: Testing may become unstable from now on."
+      timeoutObj = null # So `cb` does not clear timeout that just fired.
+      cb new Error "timeout"
+  timeoutObj = setTimeout timeoutFunc, 60 * 1000
 
   try
     # If we crash before we hit the main event loop, we have to recover and
@@ -162,7 +175,7 @@ class Runner
     fo = @new_file_obj fn
 
     if code.init?
-      await run_test_case_with_catch code.init, fo.new_case(), defer err
+      await run_test_case_guarded code.init, fo.new_case(), defer err
     else
       await fo.default_init defer ok
       err = "failed to run default init" unless ok
@@ -181,7 +194,7 @@ class Runner
         C = fo.new_case()
         hit_error = false
 
-        await run_test_case_with_catch v, C, defer err
+        await run_test_case_guarded v, C, defer err
 
         if err
           @err "In #{fn}/#{k}: #{err}"
@@ -194,7 +207,7 @@ class Runner
           @report_bad_outcome "#{BAD_X} TESTFAIL #{fn}: #{k}"
 
     if destroy?
-      await run_test_case_with_catch destroy, fo.new_case(), defer err
+      await run_test_case_guarded destroy, fo.new_case(), defer err
     else
       await fo.default_destroy defer()
 
