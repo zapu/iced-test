@@ -257,9 +257,9 @@ class Runner
     if @_n_files isnt @_n_good_files
       @err " -> Only #{@_n_good_files}/#{@_n_files} files ran properly", { bold : true }
 
-    if @_failures.length
+    if (file_failures = (k for k,v of @_file_states when not v)).length
       @log "Failed in files (pass as arguments to runner to retry):", { red : true }
-      @log "  " + (k for k,v of @_file_states when not v).join(' '), {}
+      @log "  " + file_failures.join(' '), {}
       @log "", {}
     return @_rc
 
@@ -308,6 +308,7 @@ exports.ServerRunner = class ServerRunner extends Runner
     catch e
       @err "When compiling test file '#{f}' (not running yet):"
       @err "In reading #{m}: #{e}\n#{e.stack}"
+      @_file_states[f] = false
       # Iced miscompilation workaround - if ended up in the catch block,
       # it wouldn't exit it to call cb. So we call it again here, but do
       # return as well for when the iced bug is fixed.

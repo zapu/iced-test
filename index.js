@@ -453,7 +453,7 @@
     };
 
     Runner.prototype.report = function() {
-      var k, opts, v;
+      var file_failures, k, opts, v;
       if (this._rc < 0) {
         this.err("" + BAD_X + " Failure due to test configuration issues");
       }
@@ -472,22 +472,22 @@
           bold: true
         });
       }
-      if (this._failures.length) {
+      if ((file_failures = (function() {
+        var _ref, _results;
+        _ref = this._file_states;
+        _results = [];
+        for (k in _ref) {
+          v = _ref[k];
+          if (!v) {
+            _results.push(k);
+          }
+        }
+        return _results;
+      }).call(this)).length) {
         this.log("Failed in files (pass as arguments to runner to retry):", {
           red: true
         });
-        this.log("  " + ((function() {
-          var _ref, _results;
-          _ref = this._file_states;
-          _results = [];
-          for (k in _ref) {
-            v = _ref[k];
-            if (!v) {
-              _results.push(k);
-            }
-          }
-          return _results;
-        }).call(this)).join(' '), {});
+        this.log("  " + file_failures.join(' '), {});
         this.log("", {});
       }
       return this._rc;
@@ -575,6 +575,7 @@
             e = _error;
             _this.err("When compiling test file '" + f + "' (not running yet):");
             _this.err("In reading " + m + ": " + e + "\n" + e.stack);
+            _this._file_states[f] = false;
             return cb(e);
           }
         });
@@ -632,7 +633,7 @@
                 return files = arguments[1];
               };
             })(),
-            lineno: 336
+            lineno: 337
           }));
           __iced_deferrals._fulfill();
         });
@@ -683,7 +684,7 @@
                 return ok = arguments[0];
               };
             })(),
-            lineno: 356
+            lineno: 357
           }));
           __iced_deferrals._fulfill();
         });
@@ -703,7 +704,7 @@
                       return ok = arguments[0];
                     };
                   })(),
-                  lineno: 357
+                  lineno: 358
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -720,7 +721,7 @@
                     funcname: "ServerRunner.run"
                   });
                   _this.run_files(__iced_deferrals.defer({
-                    lineno: 358
+                    lineno: 359
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -741,7 +742,7 @@
                       return ok = arguments[0];
                     };
                   })(),
-                  lineno: 360
+                  lineno: 361
                 }));
                 __iced_deferrals._fulfill();
               })(function() {
@@ -815,7 +816,7 @@
                 return ok = arguments[0];
               };
             })(),
-            lineno: 389
+            lineno: 390
           }));
           __iced_deferrals._fulfill();
         });
@@ -861,7 +862,7 @@
                           return ok = arguments[0];
                         };
                       })(),
-                      lineno: 391
+                      lineno: 392
                     }));
                     __iced_deferrals._fulfill();
                   })(_next);
@@ -885,7 +886,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 393
+                lineno: 394
               }));
               __iced_deferrals._fulfill();
             })(function() {
@@ -928,7 +929,7 @@
               return rc = arguments[0];
             };
           })(),
-          lineno: 403
+          lineno: 404
         }));
         __iced_deferrals._fulfill();
       });
