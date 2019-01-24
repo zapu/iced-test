@@ -15,13 +15,27 @@ sort_fn = (a,b) ->
 
 ##-----------------------------------------------------------------------
 
-get_outside_callsite_stackline = (err) ->
+get_relevant_stack_frames = (filepath, err) ->
+  stacklines = (err ? new Error()).stack.split('\n').slice(1)
+  ret = []
+  # If we have test file path, try to find first stack line with that path.
+  if filepath
+    lines = stacklines.filter (x) -> x.indexOf(filepath) isnt -1
+    ret.push s1 if (s1 = lines?[0]?.trim())
+
+  # Also try to find first frame outside of iced-test
   if module?.filename
-    # Find first stackline without iced-test filename.
-    stacklines = (err ? new Error()).stack.split('\n').slice(1).filter (x) -> x.indexOf(module.filename) is -1
-    return stacklines[0]?.trim()
+    lines = stacklines.filter (x) -> x.indexOf(module.filename) is -1
+    ret.unshift s2 if (s2 = lines?[0]?.trim()) and s2 isnt s1
+
+  return ret
+
+format_stack_frame_str = (filepath, err) ->
+  ret = get_relevant_stack_frames filepath, err
+  if ret.length
+    return ret.join('\n or ')
   else
-    return null
+    return err?.stack
 
 ##-----------------------------------------------------------------------
 
@@ -65,7 +79,7 @@ exports.Case = class Case
   ##-----------------------------------------
 
   error : (e) ->
-    if stackline = get_outside_callsite_stackline()
+    if stackline = format_stack_frame_str @file?.runner?._cur_file_path
       e = "#{e} (#{stackline})"
     @file.test_error_message e
     @_ok = false
@@ -146,6 +160,8 @@ class Runner
         remove_uncaught()
         gcb.apply @, arguments
 
+    format_stack = (err) => format_stack_frame_str @_cur_file_path, err
+
     if @uncaughtException
       # "On Error Resume Next"
       # This is needed, because otherwise testing is stopped after first
@@ -156,11 +172,7 @@ class Runner
       process.on 'uncaughtException', (err) ->
         console.log ":: Recovering from async exception: #{err}"
         console.log ":: Testing may become unstable from now on."
-        try
-          if callsite = get_outside_callsite_stackline(err)
-            console.log callsite
-          else
-            console.log err.stack
+        try console.log format_stack(err)
         cb err
 
     if @timeoutMs
@@ -179,10 +191,7 @@ class Runner
       code case_obj, cb
     catch err
       console.log ":: Caught sync exception: #{err}"
-      if callsite = get_outside_callsite_stackline(err)
-        console.log callsite
-      else
-        console.log err.stack
+      try console.log format_stack(err)
       cb err
 
   run_code : (fn, code, cb) ->
@@ -294,6 +303,7 @@ exports.ServerRunner = class ServerRunner extends Runner
     try
       m = path.resolve @_dir, f
       dat = require m
+      @_cur_file_path = m
       await @run_code f, dat, defer() unless dat.skip?
     catch e
       @err "When compiling test file '#{f}' (not running yet):"
