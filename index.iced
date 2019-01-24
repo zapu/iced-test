@@ -15,6 +15,13 @@ sort_fn = (a,b) ->
 
 ##-----------------------------------------------------------------------
 
+get_outside_callsite_stackline = () ->
+  # Find first stackline without iced-test filename.
+  stacklines = new Error().stack.split('\n').slice(1).filter (x) -> x.indexOf(module.filename) is -1
+  return stacklines[0]?.trim()
+
+##-----------------------------------------------------------------------
+
 exports.File = class File
   constructor : (@name, @runner) ->
   new_case : () -> return new Case @
@@ -87,6 +94,8 @@ exports.Case = class Case
   ##-----------------------------------------
 
   error : (e) ->
+    if stackline = get_outside_callsite_stackline()
+      e = "#{e} (#{stackline})"
     @file.test_error_message e
     @_ok = false
 
