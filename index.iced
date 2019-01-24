@@ -1,9 +1,9 @@
-
 fs = require 'fs'
 path = require 'path'
 colors = require 'colors'
 deep_equal = require 'deep-equal'
 urlmod = require 'url'
+vm = null # require on demand in run_code_in_vm
 
 CHECK = "\u2714"
 BAD_X = "\u2716"
@@ -124,12 +124,12 @@ class Runner
 
   ##-----------------------------------------
 
-  new_file_obj : (fn) -> new File fn, @
+  new_file_obj : (filename) -> new File filename, @
 
   ##-----------------------------------------
 
-  run_code : (fn, code, cb) ->
-    fo = @new_file_obj fn
+  run_code : (filename, code, cb) ->
+    fo = @new_file_obj filename
 
     if code.init?
       await code.init fo.new_case(), defer err
@@ -143,7 +143,7 @@ class Runner
 
     @_n_files++
     if err
-      @err "Failed to initialize file #{fn}: #{err}"
+      @err "Failed to initialize file #{filename}: #{err}"
     else
       @_n_good_files++
       for k,v of code
@@ -158,14 +158,14 @@ class Runner
           run_test_case_with_catch v, C, defer err
 
         if err
-          @err "In #{fn}/#{k}: #{err}"
+          @err "In #{filename}/#{k}: #{err}"
           hit_error = true
 
         if C.is_ok() and not hit_error
           @_successes++
-          @report_good_outcome "#{CHECK} #{fn}: #{k}"
+          @report_good_outcome "#{CHECK} #{filename}: #{k}"
         else
-          @report_bad_outcome "#{BAD_X} TESTFAIL #{fn}: #{k}"
+          @report_bad_outcome "#{BAD_X} TESTFAIL #{filename}: #{k}"
 
     if destroy?
       await destroy fo.new_case(), defer()
@@ -173,6 +173,64 @@ class Runner
       await fo.default_destroy defer()
 
     cb()
+
+  ##-----------------------------------------
+
+  _intra_vm_func = (fo, cb) ->
+    if codeObj.init?
+      await codeObj.init fo.new_case(), defer err
+    else
+      await fo.default_init defer ok
+
+    destroy = codeObj.destroy
+    delete codeObj["init"]
+    delete codeObj["destroy"]
+
+    for k,func of codeObj
+      T = fo.new_case()
+      await func T, defer err
+      # not done.
+    cb null
+
+
+  run_code_in_vm : (filename, cb) ->
+    vm = require 'vm' unless vm?
+    fo = @new_file_obj filename
+    sandbox = {
+      require : (module.parent ? module).require
+      fo
+    }
+    vm.createContext sandbox
+    vm.runInContext "codeObj = require('#{filename}')", sandbox
+
+    console.log sandbox
+
+    {codeObj} = sandbox
+
+
+    if codeObj.init
+      res = null
+      sandbox.tc = fo.new_case()
+      sandbox.cb = () -> res = arguments
+      vm.runInContext "codeObj['init'](tc, cb)", sandbox
+      loop
+        break if res?
+        await setTimeout defer(), 1
+    else
+      vm.runInContext "fo.default_init()", sandbox
+
+    console.log "::::: rip"
+    cb new Error "wip"
+
+  prepare_code_str : (full_path) ->
+    console.log require.extensions
+    extname = path.extname full_path
+    loadFunc = require.extensions[extname]
+    if not loadFunc
+      loadFunc = require.extensions['.js']
+      console.warn "Treating '#{full_path}' as JavaScript even though the filename extension is unknown."
+    code_str = loadFunc module.parent ? module, full_path
+    return code_str
 
   ##-----------------------------------------
 
@@ -229,8 +287,7 @@ exports.ServerRunner = class ServerRunner extends Runner
   run_file : (f, cb) ->
     try
       m = path.resolve @_dir, f
-      dat = require m
-      await @run_code f, dat, defer() unless dat.skip?
+      await @run_code_in_vm m, defer()
     catch e
       @err "In reading #{m}: #{e}\n#{e.stack}"
     cb()
@@ -246,7 +303,6 @@ exports.ServerRunner = class ServerRunner extends Runner
   ##-----------------------------------------
 
   load_files : ({mainfile, whitelist, files_dir}, cb) ->
-
     wld = null
     if whitelist?
       wld = {}
