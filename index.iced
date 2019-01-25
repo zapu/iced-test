@@ -306,9 +306,12 @@ exports.ServerRunner = class ServerRunner extends Runner
       @_cur_file_path = m
       await @run_code f, dat, defer() unless dat.skip?
     catch e
-      @err "When compiling test file '#{f}' (not running yet):"
+      @err "When importing test file '#{f}' (not running tests yet):"
       @err "In reading #{m}: #{e}\n#{e.stack}"
+      # Still consider this file as attempted, so it gets listed
+      # in the report after testing.
       @_file_states[f] = false
+      @_n_files++
       # Iced miscompilation workaround - if ended up in the catch block,
       # it wouldn't exit it to call cb. So we call it again here, but do
       # return as well for when the iced bug is fixed.
