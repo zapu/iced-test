@@ -1,9 +1,7 @@
-
 fs = require 'fs'
 path = require 'path'
-colors = require 'colors'
 deep_equal = require 'deep-equal'
-urlmod = require 'url'
+colors = require 'colors'
 
 CHECK = "\u2714"
 BAD_X = "\u2716"
@@ -18,6 +16,30 @@ sort_fn = (a,b) ->
 
 ##-----------------------------------------------------------------------
 
+get_relevant_stack_frames = (filepath, err) ->
+  stacklines = (err ? new Error()).stack.split('\n').slice(1)
+  ret = []
+  # If we have test file path, try to find first stack line with that path.
+  if filepath
+    lines = stacklines.filter (x) -> x.indexOf(filepath) isnt -1
+    ret.push s1 if (s1 = lines?[0]?.trim())
+
+  # Also try to find first frame outside of iced-test
+  if module?.filename
+    lines = stacklines.filter (x) -> x.indexOf(module.filename) is -1
+    ret.unshift s2 if (s2 = lines?[0]?.trim()) and s2 isnt s1
+
+  return ret
+
+format_stack_frame_str = (filepath, err) ->
+  ret = get_relevant_stack_frames filepath, err
+  if ret.length
+    return ret.join('\n or ')
+  else
+    return err?.stack
+
+##-----------------------------------------------------------------------
+
 exports.File = class File
   constructor : (@name, @runner) ->
   new_case : () -> return new Case @
@@ -25,14 +47,6 @@ exports.File = class File
   default_destroy : (cb) -> cb true
   test_error_message : (m) -> @runner.test_error_message m
   waypoint : (m) -> @runner.waypoint m
-
-##-----------------------------------------------------------------------
-
-run_test_case_with_catch = (code, case_obj, cb) ->
-  try
-    code case_obj, cb
-  catch e
-    cb e
 
 ##-----------------------------------------------------------------------
 
@@ -66,6 +80,8 @@ exports.Case = class Case
   ##-----------------------------------------
 
   error : (e) ->
+    if stackline = format_stack_frame_str @file?.runner?._cur_file_path
+      e = "#{e} (#{stackline})"
     @file.test_error_message e
     @_ok = false
 
@@ -115,6 +131,9 @@ class Runner
     @_n_files = 0
     @_n_good_files = 0
 
+    @_file_states = {} # filename -> true (passed) / false (failed)
+    @_failures = []
+
   ##-----------------------------------------
 
   run_files : (cb) ->
@@ -128,11 +147,59 @@ class Runner
 
   ##-----------------------------------------
 
+  run_test_case_guarded : (code, case_obj, gcb) ->
+    remove_uncaught = () ->
+    timeoutObj = null
+    cb_called = false
+    cb = () =>
+      if timeoutObj
+        clearTimeout(timeoutObj)
+        timeoutObj = null
+
+      unless cb_called
+        cb_called = true
+        remove_uncaught()
+        gcb.apply @, arguments
+
+    format_stack = (err) => format_stack_frame_str @_cur_file_path, err
+
+    if @uncaughtException
+      # "On Error Resume Next"
+      # This is needed, because otherwise testing is stopped after first
+      # failed async test. We want to continue as far as we can, even if in
+      # unstable state (test run is considered "failed" from now on anyway).
+      remove_uncaught = () -> process.removeAllListeners 'uncaughtException'
+      remove_uncaught()
+      process.on 'uncaughtException', (err) ->
+        console.log ":: Recovering from async exception: #{err}"
+        console.log ":: Testing may become unstable from now on."
+        console.log format_stack(err)
+        cb err
+
+    if @timeoutMs
+      timeoutFunc = () ->
+        unless cb_called
+          console.log ":: Recovering from a timeout in test function."
+          console.log ":: Testing may become unstable from now on."
+          timeoutObj = null # So `cb` does not clear timeout that just fired.
+          cb new Error "timeout"
+      timeoutObj = setTimeout timeoutFunc, @timeoutMs
+
+    try
+      # If we crash before we hit the main event loop, we have to recover and
+      # error out here; otherwise, the error is lost and the program cleanly
+      # terminates.
+      code case_obj, cb
+    catch err
+      console.log ":: Caught sync exception: #{err}"
+      console.log format_stack(err)
+      cb err
+
   run_code : (fn, code, cb) ->
     fo = @new_file_obj fn
 
     if code.init?
-      await code.init fo.new_case(), defer err
+      await @run_test_case_guarded code.init, fo.new_case(), defer err
     else
       await fo.default_init defer ok
       err = "failed to run default init" unless ok
@@ -142,37 +209,37 @@ class Runner
     delete code["destroy"]
 
     @_n_files++
+    hit_any_error = false
     if err
       @err "Failed to initialize file #{fn}: #{err}"
+      hit_any_error = true
     else
       @_n_good_files++
-      for k,v of code
+      for k,func of code
         @_tests++
         C = fo.new_case()
-        hit_error = false
 
-        await
-          # If we crash before we hit the main event loop, we
-          # have to recover and error out here; otherwise, the
-          # error is lost and the program cleanly terminates.
-          run_test_case_with_catch v, C, defer err
+        await @run_test_case_guarded func, C, defer err
 
         if err
           @err "In #{fn}/#{k}: #{err}"
-          hit_error = true
 
-        if C.is_ok() and not hit_error
+        if C.is_ok() and not err
           @_successes++
           @report_good_outcome "#{CHECK} #{fn}: #{k}"
         else
-          @report_bad_outcome "#{BAD_X} TESTFAIL #{fn}: #{k}"
+          @report_bad_outcome outcome = "#{BAD_X} TESTFAIL #{fn}: #{k}"
+          @_failures.push outcome
+          hit_any_error = true
 
     if destroy?
-      await destroy fo.new_case(), defer()
+      await @run_test_case_guarded destroy, fo.new_case(), defer err
     else
       await fo.default_destroy defer()
 
-    cb()
+    @_file_states[fn] = not hit_any_error and not err
+
+    cb err
 
   ##-----------------------------------------
 
@@ -188,6 +255,11 @@ class Runner
 
     if @_n_files isnt @_n_good_files
       @err " -> Only #{@_n_good_files}/#{@_n_files} files ran properly", { bold : true }
+
+    if (file_failures = (k for k,v of @_file_states when not v)).length
+      @log "Failed in files (pass as arguments to runner to retry):", { red : true }
+      @log "  " + file_failures.join(' '), {}
+      @log "", {}
     return @_rc
 
   ##-----------------------------------------
@@ -230,14 +302,25 @@ exports.ServerRunner = class ServerRunner extends Runner
     try
       m = path.resolve @_dir, f
       dat = require m
+      @_cur_file_path = m
       await @run_code f, dat, defer() unless dat.skip?
     catch e
+      @err "When importing test file '#{f}' (not running tests yet):"
       @err "In reading #{m}: #{e}\n#{e.stack}"
+      # Still consider this file as attempted, so it gets listed
+      # in the report after testing.
+      @_file_states[f] = false
+      @_n_files++
+      # Iced miscompilation workaround - if ended up in the catch block,
+      # it wouldn't exit it to call cb. So we call it again here, but do
+      # return as well for when the iced bug is fixed.
+      return cb e
     cb()
 
   ##-----------------------------------------
 
   log : (msg, { green, red, bold })->
+    # Note: all of this works with 'colors' package altering `String` prototype
     msg = msg.green if green
     msg = msg.bold if bold
     msg = msg.red if red
