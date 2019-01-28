@@ -1,0 +1,51 @@
+  ☑ ran init for async_failure.iced
+  ☑ this is test1
+✔ async_failure.iced: test1
+:: Recovering from async exception: ReferenceError: hello is not defined
+:: Testing may become unstable from now on.
+at /iced-test/test/async_failure.iced:17:11
+In async_failure.iced/test_exception: ReferenceError: hello is not defined
+✖ TESTFAIL async_failure.iced: test_exception
+  ☑ this is test2
+✔ async_failure.iced: test2
+  ☑ and still ran the destructor for async_failure.iced
+- In undefined: 0 != 1 (at /iced-test/test/errors.iced:7:5)
+- Assertion failed: undefined (at /iced-test/test/errors.iced:8:5)
+- hey! (at /iced-test/test/errors.iced:9:5)
+- null (at /iced-test/test/errors.iced:10:5)
+- Error: hey! (at /iced-test/test/errors.iced:11:5)
+✖ TESTFAIL errors.iced: test1
+In errors.iced/fail_in_cb: Error: failure
+✖ TESTFAIL errors.iced: fail_in_cb
+  ☑ ran init for passing.iced
+  ☑ t1 waypoint
+✔ passing.iced: t1
+  ☑ t2 waypoint, doesn't matter
+✔ passing.iced: t2
+  ☑ and still ran the destructor for passing.iced
+  ☑ ran init for sync_failure.iced
+  ☑ test before the exception
+✔ sync_failure.iced: before
+:: Caught sync exception: ReferenceError: hello is not defined
+at exports.test_exception (/iced-test/test/sync_failure.iced:18:11)
+In sync_failure.iced/test_exception: ReferenceError: hello is not defined
+✖ TESTFAIL sync_failure.iced: test_exception
+  ☑ test after the exception
+✔ sync_failure.iced: after
+  ☑ and still ran the destructor for sync_failure.iced
+  ☑ ran init for timeout.iced
+  ☑ test before the exception
+✔ timeout.iced: before
+  ☑ we are never returning from this one!
+:: Recovering from a timeout in test function.
+:: Testing may become unstable from now on.
+In timeout.iced/timeouting_function: Error: timeout
+✖ TESTFAIL timeout.iced: timeouting_function
+  ☑ test after the exception
+✔ timeout.iced: after
+  ☑ and still ran the destructor for timeout.iced
+✖ Failure due to test configuration issues
+Tests: 8/13 passed
+Failed in files (pass as arguments to runner to retry):
+  async_failure.iced errors.iced sync_failure.iced timeout.iced
+
