@@ -1,6 +1,7 @@
 fs = require 'fs'
 path = require 'path'
 deep_equal = require 'deep-equal'
+colors = require 'colors'
 
 CHECK = "\u2714"
 BAD_X = "\u2716"
@@ -321,6 +322,7 @@ exports.ServerRunner = class ServerRunner extends Runner
   ##-----------------------------------------
 
   log : (msg, { green, red, bold })->
+    # Note: all of this works with 'colors' package altering `String` prototype
     msg = msg.green if green
     msg = msg.bold if bold
     msg = msg.red if red
