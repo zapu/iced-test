@@ -218,21 +218,19 @@ class Runner
       for k,func of code
         @_tests++
         C = fo.new_case()
-        hit_error = false
 
         await @run_test_case_guarded func, C, defer err
 
         if err
           @err "In #{fn}/#{k}: #{err}"
-          hit_error = true
-          hit_any_error = true
 
-        if C.is_ok() and not hit_error
+        if C.is_ok() and not err
           @_successes++
           @report_good_outcome "#{CHECK} #{fn}: #{k}"
         else
           @report_bad_outcome outcome = "#{BAD_X} TESTFAIL #{fn}: #{k}"
           @_failures.push outcome
+          hit_any_error = true
 
     if destroy?
       await @run_test_case_guarded destroy, fo.new_case(), defer err

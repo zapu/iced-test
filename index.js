@@ -294,7 +294,7 @@
     };
 
     Runner.prototype.run_code = function(fn, code, cb) {
-      var C, destroy, err, fo, func, hit_any_error, hit_error, k, ok, outcome, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      var C, destroy, err, fo, func, hit_any_error, k, ok, outcome, ___iced_passed_deferral, __iced_deferrals, __iced_k;
       __iced_k = __iced_k_noop;
       ___iced_passed_deferral = iced.findDeferral(arguments);
       fo = this.new_file_obj(fn);
@@ -380,7 +380,6 @@
                     func = _ref[k];
                     _this._tests++;
                     C = fo.new_case();
-                    hit_error = false;
                     (function(__iced_k) {
                       __iced_deferrals = new iced.Deferrals(__iced_k, {
                         parent: ___iced_passed_deferral,
@@ -393,16 +392,14 @@
                             return err = arguments[0];
                           };
                         })(),
-                        lineno: 222
+                        lineno: 221
                       }));
                       __iced_deferrals._fulfill();
                     })(function() {
                       if (err) {
                         _this.err("In " + fn + "/" + k + ": " + err);
-                        hit_error = true;
-                        hit_any_error = true;
                       }
-                      return _next(C.is_ok() && !hit_error ? (_this._successes++, _this.report_good_outcome("" + CHECK + " " + fn + ": " + k)) : (_this.report_bad_outcome(outcome = "" + BAD_X + " TESTFAIL " + fn + ": " + k), _this._failures.push(outcome)));
+                      return _next(C.is_ok() && !err ? (_this._successes++, _this.report_good_outcome("" + CHECK + " " + fn + ": " + k)) : (_this.report_bad_outcome(outcome = "" + BAD_X + " TESTFAIL " + fn + ": " + k), _this._failures.push(outcome), hit_any_error = true));
                     });
                   }
                 };
@@ -424,7 +421,7 @@
                         return err = arguments[0];
                       };
                     })(),
-                    lineno: 237
+                    lineno: 235
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -436,7 +433,7 @@
                     funcname: "Runner.run_code"
                   });
                   fo.default_destroy(__iced_deferrals.defer({
-                    lineno: 239
+                    lineno: 237
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -562,7 +559,7 @@
                   funcname: "ServerRunner.run_file"
                 });
                 _this.run_code(f, dat, __iced_deferrals.defer({
-                  lineno: 307
+                  lineno: 305
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -632,7 +629,7 @@
                 return files = arguments[1];
               };
             })(),
-            lineno: 342
+            lineno: 340
           }));
           __iced_deferrals._fulfill();
         });
@@ -683,7 +680,7 @@
                 return ok = arguments[0];
               };
             })(),
-            lineno: 362
+            lineno: 360
           }));
           __iced_deferrals._fulfill();
         });
@@ -703,7 +700,7 @@
                       return ok = arguments[0];
                     };
                   })(),
-                  lineno: 363
+                  lineno: 361
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -720,7 +717,7 @@
                     funcname: "ServerRunner.run"
                   });
                   _this.run_files(__iced_deferrals.defer({
-                    lineno: 364
+                    lineno: 362
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -741,7 +738,7 @@
                       return ok = arguments[0];
                     };
                   })(),
-                  lineno: 366
+                  lineno: 364
                 }));
                 __iced_deferrals._fulfill();
               })(function() {
@@ -815,7 +812,7 @@
                 return ok = arguments[0];
               };
             })(),
-            lineno: 395
+            lineno: 393
           }));
           __iced_deferrals._fulfill();
         });
@@ -861,7 +858,7 @@
                           return ok = arguments[0];
                         };
                       })(),
-                      lineno: 397
+                      lineno: 395
                     }));
                     __iced_deferrals._fulfill();
                   })(_next);
@@ -885,7 +882,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 399
+                lineno: 397
               }));
               __iced_deferrals._fulfill();
             })(function() {
@@ -928,7 +925,7 @@
               return rc = arguments[0];
             };
           })(),
-          lineno: 409
+          lineno: 407
         }));
         __iced_deferrals._fulfill();
       });
