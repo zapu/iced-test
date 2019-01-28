@@ -173,7 +173,7 @@ class Runner
       process.on 'uncaughtException', (err) ->
         console.log ":: Recovering from async exception: #{err}"
         console.log ":: Testing may become unstable from now on."
-        try console.log format_stack(err)
+        console.log format_stack(err)
         cb err
 
     if @timeoutMs
@@ -192,7 +192,7 @@ class Runner
       code case_obj, cb
     catch err
       console.log ":: Caught sync exception: #{err}"
-      try console.log format_stack(err)
+      console.log format_stack(err)
       cb err
 
   run_code : (fn, code, cb) ->

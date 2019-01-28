@@ -268,9 +268,7 @@
         process.on('uncaughtException', function(err) {
           console.log(":: Recovering from async exception: " + err);
           console.log(":: Testing may become unstable from now on.");
-          try {
-            console.log(format_stack(err));
-          } catch (_error) {}
+          console.log(format_stack(err));
           return cb(err);
         });
       }
@@ -290,9 +288,7 @@
       } catch (_error) {
         err = _error;
         console.log(":: Caught sync exception: " + err);
-        try {
-          console.log(format_stack(err));
-        } catch (_error) {}
+        console.log(format_stack(err));
         return cb(err);
       }
     };
