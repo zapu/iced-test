@@ -64,17 +64,30 @@ exports.Case = class Case
 
   ##-----------------------------------------
 
-  assert : (f, what) ->
-    if not f
-      @error "Assertion failed: #{what}"
+  assert : (val, msg) ->
+    if arguments.length > 2
+      throw new Error "Invalid assertion: too many arguments, expected at most 2"
+    if msg?
+      if (t = typeof msg) isnt "string"
+        throw new Error "Invalid assertion: expected msg of type=string, got #{t} instead"
+      if deep_equal val, msg
+        throw new Error "Invalid assertion: deep_equal(val,msg) is true, it looks like an attempted T.equal call"
+
+    if not val
+      @error "Assertion failed: #{msg}"
       @_ok = false
 
   ##-----------------------------------------
 
-  equal : (a,b,what) ->
+  equal : (a,b,msg) ->
+    if arguments.length > 3
+      throw new Error "Invalid equal call: too many arguments, expects at most 3"
+    if msg? and (t = typeof msg) isnt "string"
+      throw new Error "Invalid equal call: expected msg to be string, got #{t}"
+
     if not deep_equal a, b
       [ja, jb] = [JSON.stringify(a), JSON.stringify(b)]
-      @error "In #{what}: #{ja} != #{jb}"
+      @error "In #{msg}: #{ja} != #{jb}"
       @_ok = false
 
   ##-----------------------------------------
@@ -95,6 +108,13 @@ exports.Case = class Case
   ##-----------------------------------------
 
   esc : (cb_good, cb_bad, msg) ->
+    if typeof cb_good isnt 'function'
+      throw new Error "Bad T.esc call: cb_good is not a function"
+    else if typeof cb_bad isnt 'function'
+      throw new Error "Bad T.esc call: cb_bad is not a function"
+    else if msg? and typeof msg isnt 'string'
+      throw new Error "Bad T.esc call: msg is not a string"
+
     (err, args...) =>
       if err?
         @error (if msg? then (msg + ": ") else "") + err.toString()

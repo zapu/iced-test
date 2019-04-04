@@ -106,18 +106,36 @@
       return this.assert((s != null) && s.search(re) >= 0, msg);
     };
 
-    Case.prototype.assert = function(f, what) {
-      if (!f) {
-        this.error("Assertion failed: " + what);
+    Case.prototype.assert = function(val, msg) {
+      var t;
+      if (arguments.length > 2) {
+        throw new Error("Invalid assertion: too many arguments, expected at most 2");
+      }
+      if (msg != null) {
+        if ((t = typeof msg) !== "string") {
+          throw new Error("Invalid assertion: expected msg of type=string, got " + t + " instead");
+        }
+        if (deep_equal(val, msg)) {
+          throw new Error("Invalid assertion: deep_equal(val,msg) is true, it looks like an attempted T.equal call");
+        }
+      }
+      if (!val) {
+        this.error("Assertion failed: " + msg);
         return this._ok = false;
       }
     };
 
-    Case.prototype.equal = function(a, b, what) {
-      var ja, jb, _ref;
+    Case.prototype.equal = function(a, b, msg) {
+      var ja, jb, t, _ref;
+      if (arguments.length > 3) {
+        throw new Error("Invalid equal call: too many arguments, expects at most 3");
+      }
+      if ((msg != null) && (t = typeof msg) !== "string") {
+        throw new Error("Invalid equal call: expected msg to be string, got " + t);
+      }
       if (!deep_equal(a, b)) {
         _ref = [JSON.stringify(a), JSON.stringify(b)], ja = _ref[0], jb = _ref[1];
-        this.error("In " + what + ": " + ja + " != " + jb);
+        this.error("In " + msg + ": " + ja + " != " + jb);
         return this._ok = false;
       }
     };
@@ -139,6 +157,13 @@
     };
 
     Case.prototype.esc = function(cb_good, cb_bad, msg) {
+      if (typeof cb_good !== 'function') {
+        throw new Error("Bad T.esc call: cb_good is not a function");
+      } else if (typeof cb_bad !== 'function') {
+        throw new Error("Bad T.esc call: cb_bad is not a function");
+      } else if ((msg != null) && typeof msg !== 'string') {
+        throw new Error("Bad T.esc call: msg is not a string");
+      }
       return (function(_this) {
         return function() {
           var args, err;
@@ -218,7 +243,7 @@
                   funcname: "Runner.run_files"
                 });
                 _this.run_file(f, __iced_deferrals.defer({
-                  lineno: 140
+                  lineno: 160
                 }));
                 __iced_deferrals._fulfill();
               })(_next);
@@ -313,7 +338,7 @@
                     return err = arguments[0];
                   };
                 })(),
-                lineno: 201
+                lineno: 221
               }));
               __iced_deferrals._fulfill();
             })(__iced_k);
@@ -330,7 +355,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 203
+                lineno: 223
               }));
               __iced_deferrals._fulfill();
             })(function() {
@@ -392,7 +417,7 @@
                             return err = arguments[0];
                           };
                         })(),
-                        lineno: 221
+                        lineno: 241
                       }));
                       __iced_deferrals._fulfill();
                     })(function() {
@@ -421,7 +446,7 @@
                         return err = arguments[0];
                       };
                     })(),
-                    lineno: 235
+                    lineno: 255
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -433,7 +458,7 @@
                     funcname: "Runner.run_code"
                   });
                   fo.default_destroy(__iced_deferrals.defer({
-                    lineno: 237
+                    lineno: 257
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -559,7 +584,7 @@
                   funcname: "ServerRunner.run_file"
                 });
                 _this.run_code(f, dat, __iced_deferrals.defer({
-                  lineno: 305
+                  lineno: 325
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -629,7 +654,7 @@
                 return files = arguments[1];
               };
             })(),
-            lineno: 340
+            lineno: 360
           }));
           __iced_deferrals._fulfill();
         });
@@ -680,7 +705,7 @@
                 return ok = arguments[0];
               };
             })(),
-            lineno: 360
+            lineno: 380
           }));
           __iced_deferrals._fulfill();
         });
@@ -700,7 +725,7 @@
                       return ok = arguments[0];
                     };
                   })(),
-                  lineno: 361
+                  lineno: 381
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -717,7 +742,7 @@
                     funcname: "ServerRunner.run"
                   });
                   _this.run_files(__iced_deferrals.defer({
-                    lineno: 362
+                    lineno: 382
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -738,7 +763,7 @@
                       return ok = arguments[0];
                     };
                   })(),
-                  lineno: 364
+                  lineno: 384
                 }));
                 __iced_deferrals._fulfill();
               })(function() {
@@ -812,7 +837,7 @@
                 return ok = arguments[0];
               };
             })(),
-            lineno: 393
+            lineno: 413
           }));
           __iced_deferrals._fulfill();
         });
@@ -858,7 +883,7 @@
                           return ok = arguments[0];
                         };
                       })(),
-                      lineno: 395
+                      lineno: 415
                     }));
                     __iced_deferrals._fulfill();
                   })(_next);
@@ -882,7 +907,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 397
+                lineno: 417
               }));
               __iced_deferrals._fulfill();
             })(function() {
@@ -925,7 +950,7 @@
               return rc = arguments[0];
             };
           })(),
-          lineno: 407
+          lineno: 427
         }));
         __iced_deferrals._fulfill();
       });
