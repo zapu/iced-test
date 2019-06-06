@@ -2,6 +2,7 @@ fs = require 'fs'
 path = require 'path'
 deep_equal = require 'deep-equal'
 colors = require 'colors'
+util = require 'util'
 
 CHECK = "\u2714"
 BAD_X = "\u2716"
@@ -242,7 +243,18 @@ class Runner
         await @run_test_case_guarded func, C, defer err
 
         if err
-          @err "In #{fn}/#{k}: #{err}"
+          @err "In #{fn}/#{k}: #{err.toString()}"
+          if (tof = typeof(err)) is 'object'
+            @log "Full error object:", { red: true, underline : true }
+            @log util.format(err), {}
+            if (st = err.istack)?.length
+              @log "ISTACK (iced esc async stack):", { red : true, underline : true }
+              @log(st
+                .map((x) -> if x then x else "??? (missing 'where' information)")
+                .map((x) -> "  #{x}")
+                .join('\n'), {})
+          else
+            @log "Value passed as error is of type: #{tof}", { red : true }
 
         if C.is_ok() and not err
           @_successes++
@@ -339,11 +351,12 @@ exports.ServerRunner = class ServerRunner extends Runner
 
   ##-----------------------------------------
 
-  log : (msg, { green, red, bold })->
+  log : (msg, { green, red, bold, underline })->
     # Note: all of this works with 'colors' package altering `String` prototype
     msg = msg.green if green
     msg = msg.bold if bold
     msg = msg.red if red
+    msg = msg.underline if underline
     console.log msg
 
   ##-----------------------------------------
@@ -398,12 +411,13 @@ exports.BrowserRunner = class BrowserRunner extends Runner
 
   ##-----------------------------------------
 
-  log : (m, {red, green, bold}) ->
+  log : (m, {red, green, bold, underline}) ->
     style =
       margin : "0px"
     style.color = "green" if green
     style.color = "red" if red
     style["font-weight"] = "bold" if bold
+    style["text-decoration"] = "underline" if underline
     style_tag = ("#{k}: #{v}" for k,v of style).join "; "
     tag = "<p style=\"#{style_tag}\">#{m}</p>\n"
     $(@divs.log).innerHTML += tag
