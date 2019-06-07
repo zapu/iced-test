@@ -1,3 +1,4 @@
+runtime_const = require('iced-runtime').const
 fs = require 'fs'
 path = require 'path'
 deep_equal = require 'deep-equal'
@@ -118,9 +119,13 @@ exports.Case = class Case
 
     (err, args...) =>
       if err?
+        C = runtime_const
+        if tr = cb_good[C.trace]
+          where = [tr[C.funcname], "(#{tr[C.filename]}:#{tr[C.lineno] + 1})"]
+          err.istack ?= []
+          err.istack?.push where.filter((x) -> x).join(' ')
         @error (if msg? then (msg + ": ") else "") + err.toString()
-        @_ok = false
-        cb_bad()
+        cb_bad err
       else
         cb_good args...
 
