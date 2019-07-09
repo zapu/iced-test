@@ -160,6 +160,8 @@ class Runner
     @_file_states = {} # filename -> true (passed) / false (failed)
     @_failures = []
 
+    @_filter_pattern = null # only run test function matching this pattern (if present)
+
   ##-----------------------------------------
 
   run_files : (cb) ->
@@ -242,6 +244,9 @@ class Runner
     else
       @_n_good_files++
       for k,func of code
+        if @_filter_pattern and not k.match(@_filter_pattern)
+          continue
+
         @_tests++
         C = fo.new_case()
 
@@ -396,6 +401,8 @@ exports.ServerRunner = class ServerRunner extends Runner
   ##-----------------------------------------
 
   run : (opts, cb) ->
+    @_filter_pattern = opts.filter_pattern
+
     await @init defer ok
     await @load_files opts, defer ok  if ok
     await @run_files defer() if ok
@@ -440,11 +447,11 @@ exports.BrowserRunner = class BrowserRunner extends Runner
 
 ##-----------------------------------------------------------------------
 
-exports.run = run = ({mainfile, klass, whitelist, files_dir, runner}) ->
+exports.run = run = ({mainfile, klass, whitelist, filter_pattern, files_dir, runner}) ->
   unless runner?
     klass = ServerRunner unless klass?
     runner = new klass()
-  await runner.run { mainfile, whitelist, files_dir }, defer rc
+  await runner.run { mainfile, whitelist, files_dir, filter_pattern }, defer rc
   process.exit rc
 
 ##-----------------------------------------------------------------------
