@@ -225,6 +225,7 @@
       this._n_good_files = 0;
       this._file_states = {};
       this._failures = [];
+      this._filter_pattern = null;
     }
 
     Runner.prototype.run_files = function(cb) {
@@ -258,7 +259,7 @@
                   funcname: "Runner.run_files"
                 });
                 _this.run_file(f, __iced_deferrals.defer({
-                  lineno: 166
+                  lineno: 168
                 }));
                 __iced_deferrals._fulfill();
               })(_next);
@@ -353,7 +354,7 @@
                     return err = arguments[0];
                   };
                 })(),
-                lineno: 227
+                lineno: 229
               }));
               __iced_deferrals._fulfill();
             })(__iced_k);
@@ -370,7 +371,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 229
+                lineno: 231
               }));
               __iced_deferrals._fulfill();
             })(function() {
@@ -418,55 +419,65 @@
                   } else {
                     k = _keys[_i];
                     func = _ref[k];
-                    _this._tests++;
-                    C = fo.new_case();
                     (function(__iced_k) {
-                      __iced_deferrals = new iced.Deferrals(__iced_k, {
-                        parent: ___iced_passed_deferral,
-                        filename: "/home/zapu/Projects/iced-test/index.iced",
-                        funcname: "Runner.run_code"
-                      });
-                      _this.run_test_case_guarded(func, C, __iced_deferrals.defer({
-                        assign_fn: (function() {
-                          return function() {
-                            return err = arguments[0];
-                          };
-                        })(),
-                        lineno: 247
-                      }));
-                      __iced_deferrals._fulfill();
+                      if (_this._filter_pattern && !k.match(_this._filter_pattern)) {
+                        (function(__iced_k) {
+_continue()
+                        })(__iced_k);
+                      } else {
+                        return __iced_k();
+                      }
                     })(function() {
-                      var _ref1;
-                      if (err) {
-                        _this.err("In " + fn + "/" + k + ": " + (err.toString()));
-                        if ((tof = typeof err) === 'object') {
-                          _this.log("Full error object:", {
-                            red: true,
-                            underline: true
-                          });
-                          _this.log(util.format(err), {});
-                          if ((_ref1 = (st = err.istack)) != null ? _ref1.length : void 0) {
-                            _this.log("ISTACK (iced esc async stack):", {
+                      _this._tests++;
+                      C = fo.new_case();
+                      (function(__iced_k) {
+                        __iced_deferrals = new iced.Deferrals(__iced_k, {
+                          parent: ___iced_passed_deferral,
+                          filename: "/home/zapu/Projects/iced-test/index.iced",
+                          funcname: "Runner.run_code"
+                        });
+                        _this.run_test_case_guarded(func, C, __iced_deferrals.defer({
+                          assign_fn: (function() {
+                            return function() {
+                              return err = arguments[0];
+                            };
+                          })(),
+                          lineno: 252
+                        }));
+                        __iced_deferrals._fulfill();
+                      })(function() {
+                        var _ref1;
+                        if (err) {
+                          _this.err("In " + fn + "/" + k + ": " + (err.toString()));
+                          if ((tof = typeof err) === 'object') {
+                            _this.log("Full error object:", {
                               red: true,
                               underline: true
                             });
-                            _this.log(st.map(function(x) {
-                              if (x) {
-                                return x;
-                              } else {
-                                return "??? (missing 'where' information)";
-                              }
-                            }).map(function(x) {
-                              return "  " + x;
-                            }).join('\n'), {});
+                            _this.log(util.format(err), {});
+                            if ((_ref1 = (st = err.istack)) != null ? _ref1.length : void 0) {
+                              _this.log("ISTACK (iced esc async stack):", {
+                                red: true,
+                                underline: true
+                              });
+                              _this.log(st.map(function(x) {
+                                if (x) {
+                                  return x;
+                                } else {
+                                  return "??? (missing 'where' information)";
+                                }
+                              }).map(function(x) {
+                                return "  " + x;
+                              }).join('\n'), {});
+                            }
+                          } else {
+                            _this.log("Value passed as error is of type: " + tof, {
+                              red: true
+                            });
                           }
-                        } else {
-                          _this.log("Value passed as error is of type: " + tof, {
-                            red: true
-                          });
                         }
-                      }
-                      return _next(C.is_ok() && !err ? (_this._successes++, _this.report_good_outcome("" + CHECK + " " + fn + ": " + k)) : (_this.report_bad_outcome(outcome = "" + BAD_X + " TESTFAIL " + fn + ": " + k), _this._failures.push(outcome), hit_any_error = true));
+                        return _next(C.is_ok() && !err ? (_this._successes++, _this.report_good_outcome("" + CHECK + " " + fn + ": " + k)) : (_this.report_bad_outcome(outcome = "" + BAD_X + " TESTFAIL " + fn + ": " + k), _this._failures.push(outcome), hit_any_error = true));
+                      });
                     });
                   }
                 };
@@ -488,7 +499,7 @@
                         return err = arguments[0];
                       };
                     })(),
-                    lineno: 272
+                    lineno: 277
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -500,7 +511,7 @@
                     funcname: "Runner.run_code"
                   });
                   fo.default_destroy(__iced_deferrals.defer({
-                    lineno: 274
+                    lineno: 279
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -626,7 +637,7 @@
                   funcname: "ServerRunner.run_file"
                 });
                 _this.run_code(f, dat, __iced_deferrals.defer({
-                  lineno: 342
+                  lineno: 347
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -699,7 +710,7 @@
                 return files = arguments[1];
               };
             })(),
-            lineno: 378
+            lineno: 383
           }));
           __iced_deferrals._fulfill();
         });
@@ -737,6 +748,7 @@
       var ok, ___iced_passed_deferral, __iced_deferrals, __iced_k;
       __iced_k = __iced_k_noop;
       ___iced_passed_deferral = iced.findDeferral(arguments);
+      this._filter_pattern = opts.filter_pattern;
       (function(_this) {
         return (function(__iced_k) {
           __iced_deferrals = new iced.Deferrals(__iced_k, {
@@ -750,7 +762,7 @@
                 return ok = arguments[0];
               };
             })(),
-            lineno: 398
+            lineno: 405
           }));
           __iced_deferrals._fulfill();
         });
@@ -770,7 +782,7 @@
                       return ok = arguments[0];
                     };
                   })(),
-                  lineno: 399
+                  lineno: 406
                 }));
                 __iced_deferrals._fulfill();
               })(__iced_k);
@@ -787,7 +799,7 @@
                     funcname: "ServerRunner.run"
                   });
                   _this.run_files(__iced_deferrals.defer({
-                    lineno: 400
+                    lineno: 407
                   }));
                   __iced_deferrals._fulfill();
                 })(__iced_k);
@@ -808,7 +820,7 @@
                       return ok = arguments[0];
                     };
                   })(),
-                  lineno: 402
+                  lineno: 409
                 }));
                 __iced_deferrals._fulfill();
               })(function() {
@@ -885,7 +897,7 @@
                 return ok = arguments[0];
               };
             })(),
-            lineno: 432
+            lineno: 439
           }));
           __iced_deferrals._fulfill();
         });
@@ -931,7 +943,7 @@
                           return ok = arguments[0];
                         };
                       })(),
-                      lineno: 434
+                      lineno: 441
                     }));
                     __iced_deferrals._fulfill();
                   })(_next);
@@ -955,7 +967,7 @@
                     return ok = arguments[0];
                   };
                 })(),
-                lineno: 436
+                lineno: 443
               }));
               __iced_deferrals._fulfill();
             })(function() {
@@ -972,10 +984,10 @@
   })(Runner);
 
   exports.run = run = function(_arg) {
-    var files_dir, klass, mainfile, rc, runner, whitelist, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    var files_dir, filter_pattern, klass, mainfile, rc, runner, whitelist, ___iced_passed_deferral, __iced_deferrals, __iced_k;
     __iced_k = __iced_k_noop;
     ___iced_passed_deferral = iced.findDeferral(arguments);
-    mainfile = _arg.mainfile, klass = _arg.klass, whitelist = _arg.whitelist, files_dir = _arg.files_dir, runner = _arg.runner;
+    mainfile = _arg.mainfile, klass = _arg.klass, whitelist = _arg.whitelist, filter_pattern = _arg.filter_pattern, files_dir = _arg.files_dir, runner = _arg.runner;
     if (runner == null) {
       if (klass == null) {
         klass = ServerRunner;
@@ -991,14 +1003,15 @@
         runner.run({
           mainfile: mainfile,
           whitelist: whitelist,
-          files_dir: files_dir
+          files_dir: files_dir,
+          filter_pattern: filter_pattern
         }, __iced_deferrals.defer({
           assign_fn: (function() {
             return function() {
               return rc = arguments[0];
             };
           })(),
-          lineno: 446
+          lineno: 453
         }));
         __iced_deferrals._fulfill();
       });
